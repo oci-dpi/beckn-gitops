@@ -55,6 +55,9 @@ spec:
             values: |
               global:
                 domain: argocd-beckn.{{metadata.annotations.domain}}
+              configs:
+                secret:
+                  argocdServerAdminPassword: {{metadata.annotations.argocd_admin_password}}
               server:
                 ingress:
                   enabled: {{metadata.annotations.create_ingress}}
