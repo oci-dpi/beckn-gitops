@@ -1,0 +1,40 @@
+# Helm chart values
+global:
+  leaderElection:
+    namespace: cert-manager
+extraObjects:
+  - |
+    apiVersion: cert-manager.io/v1
+    kind: ClusterIssuer
+    metadata:
+      name: letsencrypt-stage
+    spec:
+      acme:
+        server: https://acme-staging-v02.api.letsencrypt.org/directory
+        privateKeySecretRef:
+          name: letsencrypt-stage
+        solvers:
+          - http01:
+              ingress:
+                ingressClassName: nginx
+  - |
+    apiVersion: cert-manager.io/v1
+    kind: ClusterIssuer
+    metadata:
+      name: letsencrypt-prod
+    spec:
+      acme:
+        server: https://acme-v02.api.letsencrypt.org/directory
+        privateKeySecretRef:
+          name: letsencrypt-prod
+        solvers:
+          - http01:
+              ingress:
+                ingressClassName: nginx
+  - |
+    apiVersion: cert-manager.io/v1
+    kind: ClusterIssuer
+    metadata:
+      name: self-signed-issuer
+    spec:
+      selfSigned: {}

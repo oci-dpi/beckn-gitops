@@ -1,0 +1,10 @@
+preUpgradeChecker:
+  jobEnabled: false
+defaultSettings:
+  deletingConfirmationFlag: true
+persistence:
+  defaultClassReplicaCount: 3
+  nfsOptions: "hard,timeo=50,retrans=1"
+service:
+  ui:
+    type: ClusterIP
