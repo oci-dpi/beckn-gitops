@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: addons-longhorn
+  name: addons-pg-operator
 spec:
   goTemplate: true
   syncPolicy:
@@ -13,14 +13,14 @@ spec:
         generators:
           - clusters:
               values:
-                addonChart: longhorn
+                addonChart: cloudnative-pg
                 # anything not staging or prod use this version
-                addonChartVersion: 1.9.1
-                addonChartRepositoryNamespace: longhorn-system
-                addonChartRepository: https://charts.longhorn.io
+                addonChartVersion: 0.24.0
+                addonChartRepositoryNamespace: cnpg-system
+                addonChartRepository: https://cloudnative-pg.github.io/charts
               selector:
                 matchExpressions:
-                  - key: enable_longhorn
+                  - key: enable_beckn
                     operator: In
                     values: ['true']
           - clusters:
@@ -28,16 +28,16 @@ spec:
                 matchLabels:
                   environment: dev
               values:
-                addonChartVersion: 1.9.1
+                addonChartVersion: 0.24.0
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: 1.9.1
+                addonChartVersion: 0.24.0
   template:
     metadata:
-      name: '{{.values.addonChart}}'
+      name: 'beckn-pg-operator'
       annotations:
         argocd.argoproj.io/sync-wave: "-10"  
     spec:
@@ -53,8 +53,8 @@ spec:
             releaseName: '{{.values.addonChart}}'
             ignoreMissingValueFiles: true
             valueFiles:
-              - $values/{{.metadata.annotations.addons_repo_basepath}}environments/default/addons/{{.values.addonChart}}/values.yaml
-              - $values/{{.metadata.annotations.addons_repo_basepath}}environments/{{.metadata.labels.environment}}/addons/{{.values.addonChart}}/values.yaml
+              - $values/{{.metadata.annotations.addons_repo_basepath}}environments/default/addons/postgres-operator/values.yaml
+              - $values/{{.metadata.annotations.addons_repo_basepath}}environments/{{.metadata.labels.environment}}/addons/postgres-operator/values.yaml
       destination:
         namespace: '{{.values.addonChartRepositoryNamespace}}'
         name: '{{.name}}'
