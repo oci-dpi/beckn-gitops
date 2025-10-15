@@ -57,6 +57,11 @@ server:
     type: ClusterIP
 
 configs:
+  repositories: 
+    bitnami-helm-repo:
+      url: https://charts.bitnami.com/bitnami
+      name: bitnami
+      type: helm
   cm:
     application.resourceTrackingMethod: 'annotation' #use annotation for tracking required for Crossplane
     resource.exclusions: |
