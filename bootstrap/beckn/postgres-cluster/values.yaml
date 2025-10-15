@@ -1,5 +1,6 @@
 pg_db_user: beckn 
 cluster: 
-  superuserSecret: "superuser-secret"
-  version:
-    postgresql: "14"
+  cluster: 
+    superuserSecret: "superuser-secret"
+    version:
+      postgresql: "14"

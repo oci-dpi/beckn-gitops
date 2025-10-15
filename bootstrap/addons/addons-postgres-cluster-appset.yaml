@@ -18,7 +18,7 @@ spec:
                 addonChartRepositoryNamespace: postgres
               selector:
                 matchExpressions:
-                  - key: enable_beckn_postgres
+                  - key: enable_beckn
                     operator: In
                     values: ['true']
           - clusters:
