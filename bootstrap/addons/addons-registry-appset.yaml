@@ -15,7 +15,7 @@ spec:
                 addonChart: registry
                 # anything not staging or prod use this version
                 addonChartVersion: 0.1.0
-                addonChartRepositoryNamespace: postgres
+                addonChartRepositoryNamespace: registry
               selector:
                 matchExpressions:
                   - key: enable_beckn
