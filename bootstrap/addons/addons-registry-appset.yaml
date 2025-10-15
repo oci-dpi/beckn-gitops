@@ -47,25 +47,25 @@ spec:
             valueFiles:
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
             values: |
-              externalDomain: registry-beckn.{{ .metadata.annotations.domain }}
+              externalDomain: registry-beckn.{{ metadata.annotations.domain }}
               ingress:
                 enabled: true
                 annotations: 
-                  cert-manager.io/cluster-issuer: "{{ .metadata.annotations.certificate_issuer }}"
+                  cert-manager.io/cluster-issuer: "{{ metadata.annotations.certificate_issuer }}"
                 ingressClassName: nginx
                 hosts:
-                  - host: registry-beckn.{{ .metadata.annotations.domain }}
+                  - host: registry-beckn.{{ metadata.annotations.domain }}
                     paths:
                       - /
                 tls:
                   - hosts:
-                      - registry.{{ .metadata.annotations.domain }}
+                      - registry.{{ metadata.annotations.domain }}
                     secretName: beckn-onix-registry-tls
               database:
                 host: postgres-cluster-rw.postgres
                 dbname: registry
-                username: "{{ .metadata.annotations.pg_db_user }}"
-                password: "{{ .metadata.annotations.pg_db_password }}"
+                username: "{{ metadata.annotations.pg_db_user }}"
+                password: "{{ metadata.annotations.pg_db_password }}"
       destination:
         namespace: '{{values.addonChartRepositoryNamespace}}'
         name: '{{name}}'
