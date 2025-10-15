@@ -13,6 +13,8 @@ redis:
       size: 1Gi 
 
 mongodb: 
+  image: 
+    repository: bitnamilegacy/redis
   global:
     storageClass: "longhorn"
   persistence:
@@ -20,6 +22,8 @@ mongodb:
 
 
 rabbitmq: 
+  image: 
+    repository: bitnamilegacy/redis
   global:
     storageClass: "longhorn"
   persistence:
