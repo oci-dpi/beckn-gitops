@@ -38,6 +38,8 @@ spec:
   template:
     metadata:
       name: '{{.values.addonChart}}'
+      annotations:
+        argocd.argoproj.io/manifest-generate-paths: .
     spec:
       project: default
       sources:

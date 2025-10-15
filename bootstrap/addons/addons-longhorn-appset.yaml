@@ -40,6 +40,7 @@ spec:
       name: '{{.values.addonChart}}'
       annotations:
         argocd.argoproj.io/sync-wave: "-10"  
+        argocd.argoproj.io/manifest-generate-paths: .
     spec:
       project: default
       sources:
