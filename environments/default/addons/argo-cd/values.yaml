@@ -19,7 +19,7 @@ repoServer:
       memory: '512Mi'
     limits:
       cpu: '200m'
-      memory: '512Mi'
+      memory: '1Gi'
   metrics:
     enabled: false
     service:
