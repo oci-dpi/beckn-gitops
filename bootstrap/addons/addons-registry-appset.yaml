@@ -47,6 +47,7 @@ spec:
             valueFiles:
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
             values: |
+              namespace: {{values.addonChartRepositoryNamespace}}
               externalDomain: registry-beckn.{{ metadata.annotations.domain }}
               ingress:
                 enabled: true
