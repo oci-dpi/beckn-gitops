@@ -1,0 +1,13 @@
+# Helm chart values
+image: 
+  repository: bitnamilegacy/redis
+auth:
+  enabled: false
+global:
+  storageClass: "longhorn"
+master:
+  persistence: 
+    size: 1Gi
+replica:
+  persistence: 
+    size: 1Gi 

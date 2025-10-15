@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: addons-bap-common
+  name: addons-bap-redis
 spec:
   syncPolicy:
     preserveResourcesOnDeletion: false
@@ -12,13 +12,13 @@ spec:
         generators:
           - clusters:
               values:
-                addonChart: bap-common
-                # anything not staging or prod use this version
-                addonChartVersion: 0.1.0
+                addonChart: redis
+                addonChartVersion: 23.1.3
                 addonChartRepositoryNamespace: bap-common
+                addonChartRepository: https://charts.bitnami.com/bitnami
               selector:
                 matchExpressions:
-                  - key: enable_beckn_bap_common
+                  - key: enable_beckn
                     operator: In
                     values: ['true']
           - clusters:
@@ -26,7 +26,7 @@ spec:
                 matchLabels:
                   environment: dev
               values:
-                addonChartVersion: 0.1.0
+                addonChartVersion: 23.1.3
   template:
     metadata:
       name: '{{values.addonChart}}'
@@ -39,31 +39,31 @@ spec:
         - repoURL: '{{metadata.annotations.addons_repo_url}}'
           targetRevision: '{{metadata.annotations.addons_repo_revision}}'
           ref: values
-        - path: bootstrap/beckn/{{values.addonChart}}
-          repoURL: '{{metadata.annotations.addons_repo_url}}'
-          targetRevision: '{{metadata.annotations.addons_repo_revision}}'
+        - chart: '{{values.addonChart}}'
+          repoURL: '{{values.addonChartRepository}}'
+          targetRevision: '{{values.addonChartVersion}}'
           helm:
             releaseName: '{{values.addonChart}}'
             ignoreMissingValueFiles: true
             valueFiles:
-              - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
-            values: |
-              rabbitmq:
-                auth:
-                  username: "{{ metadata.annotations.bap_rabbitmq_username }}" 
-                  password: "{{ metadata.annotations.bap_rabbitmq_password }}"
-                  securePassword: false 
-              mongodb: 
-                auth:
-                  enabled: true
-                  rootUser: "{{ metadata.annotations.bap_mongo_auth_username }}"
-                  rootPassword: "{{ metadata.annotations.bap_mongo_auth_password }}"
-                  usernames:
-                    - "{{ metadata.annotations.bap_mongo_username }}"
-                  passwords:
-                    - "{{ metadata.annotations.bap_mongo_password }}"
-                  databases:
-                    - "protocol_server" 
+              - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}-bap/values.yaml
+            # values: |
+            #   rabbitmq:
+            #     auth:
+            #       username: "{{ metadata.annotations.bap_rabbitmq_username }}" 
+            #       password: "{{ metadata.annotations.bap_rabbitmq_password }}"
+            #       securePassword: false 
+            #   mongodb: 
+            #     auth:
+            #       enabled: true
+            #       rootUser: "{{ metadata.annotations.bap_mongo_auth_username }}"
+            #       rootPassword: "{{ metadata.annotations.bap_mongo_auth_password }}"
+            #       usernames:
+            #         - "{{ metadata.annotations.bap_mongo_username }}"
+            #       passwords:
+            #         - "{{ metadata.annotations.bap_mongo_password }}"
+            #       databases:
+            #         - "protocol_server" 
       destination:
         namespace: '{{values.addonChartRepositoryNamespace}}'
         name: '{{name}}'
