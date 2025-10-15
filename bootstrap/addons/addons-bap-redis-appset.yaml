@@ -18,7 +18,7 @@ spec:
                 addonChartRepository: https://charts.bitnami.com/bitnami
               selector:
                 matchExpressions:
-                  - key: enable_beckn_redis
+                  - key: enable_beckn
                     operator: In
                     values: ['true']
           - clusters:
@@ -66,7 +66,7 @@ spec:
             #         - "protocol_server" 
       destination:
         namespace: '{{values.addonChartRepositoryNamespace}}'
-        name: '{{name}}-bap'
+        name: 'bap-{{name}}'
       syncPolicy:
         automated:
           prune: true
