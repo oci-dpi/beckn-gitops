@@ -19,7 +19,7 @@ cluster:
       postInitSQL:
         - CREATE DATABASE gateway WITH OWNER = beckn TEMPLATE = template0 ENCODING = 'UTF8' TABLESPACE = pg_default CONNECTION LIMIT = -1;
     monitoring:
-      enabled: true
+      enabled: false
     storage:
       size: 1Gi
       storageClass: "longhorn"
