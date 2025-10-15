@@ -1,0 +1,16 @@
+apiVersion: v2
+name: bap-common
+description: A Helm chart for bap-common Components
+type: application
+version: 0.1.0
+appVersion: "1.0"
+dependencies:
+- name: redis
+  version: 21.2.7
+  repository: https://charts.bitnami.com/bitnami
+- name: mongodb
+  version: 16.5.26
+  repository: https://charts.bitnami.com/bitnami
+- name: rabbitmq
+  version: 16.0.10
+  repository: https://charts.bitnami.com/bitnami

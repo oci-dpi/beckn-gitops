@@ -1,0 +1,75 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: addons-bap-common
+spec:
+  syncPolicy:
+    preserveResourcesOnDeletion: false
+  generators:
+    - merge:
+        mergeKeys: [server]
+        generators:
+          - clusters:
+              values:
+                addonChart: bap-common
+                # anything not staging or prod use this version
+                addonChartVersion: 0.1.0
+                addonChartRepositoryNamespace: bap-common
+              selector:
+                matchExpressions:
+                  - key: enable_beckn
+                    operator: In
+                    values: ['true']
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: dev
+              values:
+                addonChartVersion: 0.1.0
+  template:
+    metadata:
+      name: '{{values.addonChart}}'
+      annotations:
+        argocd.argoproj.io/sync-wave: "-5"  
+    spec:
+      project: default
+      sources:
+        - repoURL: '{{metadata.annotations.addons_repo_url}}'
+          targetRevision: '{{metadata.annotations.addons_repo_revision}}'
+          ref: values
+        - path: bootstrap/beckn/{{values.addonChart}}
+          repoURL: '{{metadata.annotations.addons_repo_url}}'
+          targetRevision: '{{metadata.annotations.addons_repo_revision}}'
+          helm:
+            releaseName: '{{values.addonChart}}'
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
+            values: |
+              rabbitmq:
+                auth:
+                  username: "{{ metadata.annotations.bap_rabbitmq_username }}" 
+                  password: "{{ metadata.annotations.bap_rabbitmq_password }}"
+                  securePassword: false 
+              mongodb: 
+                auth:
+                  enabled: true
+                  rootUser: "{{ metadata.annotations.bap_mongo_auth_username }}"
+                  rootPassword: "{{ metadata.annotations.bap_mongo_auth_password }}"
+                  usernames:
+                    - "{{ metadata.annotations.bap_mongo_username }}"
+                  passwords:
+                    - "{{ metadata.annotations.bap_mongo_password }}"
+                  databases:
+                    - "protocol_server" 
+      destination:
+        namespace: '{{values.addonChartRepositoryNamespace}}'
+        name: '{{name}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          # - ServerSideApply=true  # Big CRDs.

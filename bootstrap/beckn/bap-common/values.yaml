@@ -1,0 +1,24 @@
+redis: 
+  auth:
+    enabled: false
+  global:
+    storageClass: "longhorn"
+  master:
+    persistence: 
+      size: 1Gi
+  replica:
+    persistence: 
+      size: 1Gi 
+
+mongodb: 
+  global:
+    storageClass: "longhorn"
+  persistence:
+    size: 1Gi
+
+
+rabbitmq: 
+  global:
+    storageClass: "longhorn"
+  persistence:
+    size: 1Gi
