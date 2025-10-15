@@ -15,7 +15,7 @@ spec:
               values:
                 addonChart: longhorn
                 # anything not staging or prod use this version
-                addonChartVersion: 1.9.1
+                addonChartVersion: 1.10.0
                 addonChartRepositoryNamespace: longhorn-system
                 addonChartRepository: https://charts.longhorn.io
               selector:
@@ -28,13 +28,13 @@ spec:
                 matchLabels:
                   environment: dev
               values:
-                addonChartVersion: 1.9.1
+                addonChartVersion: 1.10.0
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: 1.9.1
+                addonChartVersion: 1.10.0
   template:
     metadata:
       name: '{{.values.addonChart}}'
