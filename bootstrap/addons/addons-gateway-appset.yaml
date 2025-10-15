@@ -61,7 +61,7 @@ spec:
                       - /
                 tls:
                   - hosts:
-                      - gateway.{{ metadata.annotations.domain }}
+                      - gateway-beckn.{{ metadata.annotations.domain }}
                     secretName: beckn-onix-gateway-tls
               database:
                 host: postgres-cluster-rw.postgres

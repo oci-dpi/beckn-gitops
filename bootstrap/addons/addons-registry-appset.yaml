@@ -60,7 +60,7 @@ spec:
                       - /
                 tls:
                   - hosts:
-                      - registry.{{ metadata.annotations.domain }}
+                      - registry-beckn.{{ metadata.annotations.domain }}
                     secretName: beckn-onix-registry-tls
               database:
                 host: postgres-cluster-rw.postgres
