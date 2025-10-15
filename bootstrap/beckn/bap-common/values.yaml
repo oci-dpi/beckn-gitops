@@ -14,7 +14,7 @@ redis:
 
 mongodb: 
   image: 
-    repository: bitnamilegacy/redis
+    repository: bitnamilegacy/mongodb
   global:
     storageClass: "longhorn"
   persistence:
@@ -23,7 +23,7 @@ mongodb:
 
 rabbitmq: 
   image: 
-    repository: bitnamilegacy/redis
+    repository: bitnamilegacy/rabbitmq
   global:
     storageClass: "longhorn"
   persistence:
