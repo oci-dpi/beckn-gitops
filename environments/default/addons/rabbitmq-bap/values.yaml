@@ -4,6 +4,8 @@ image:
   # tag: latest
 global:
   storageClass: "longhorn"
+  security:
+    allowInsecureImages: true
 persistence:
   size: 1Gi
 persistentVolumeClaimRetentionPolicy:
