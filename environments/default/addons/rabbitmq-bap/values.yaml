@@ -1,0 +1,11 @@
+# Helm chart values
+image: 
+  repository: bitnamilegacy/mongodb
+global:
+  storageClass: "longhorn"
+persistence:
+  size: 1Gi
+persistentVolumeClaimRetentionPolicy:
+  enabled: true
+  whenScaled: Retain
+  whenDeleted: Delete
