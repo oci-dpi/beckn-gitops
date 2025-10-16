@@ -1,6 +1,6 @@
 # Helm chart values
-# image: 
-#   repository: bitnamilegacy/redis
+image: 
+  repository: bitnamilegacy/redis
 auth:
   enabled: false
 global:
