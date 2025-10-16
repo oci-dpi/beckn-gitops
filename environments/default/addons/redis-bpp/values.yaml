@@ -1,0 +1,21 @@
+# Helm chart values
+image: 
+  repository: bitnamilegacy/redis
+auth:
+  enabled: false
+global:
+  storageClass: "longhorn"
+master:
+  persistence: 
+    size: 1Gi
+  persistentVolumeClaimRetentionPolicy:
+    enabled: true
+    whenScaled: Retain
+    whenDeleted: Delete
+replica:
+  persistence: 
+    size: 1Gi 
+  persistentVolumeClaimRetentionPolicy:
+    enabled: true
+    whenScaled: Retain
+    whenDeleted: Delete
