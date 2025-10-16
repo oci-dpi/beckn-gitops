@@ -8,6 +8,10 @@ global:
 master:
   persistence: 
     size: 1Gi
+  persistentVolumeClaimRetentionPolicy:
+    enabled: enabled
+    whenScaled: Retain
+    whenDeleted: Delete
 replica:
   persistence: 
     size: 1Gi 
