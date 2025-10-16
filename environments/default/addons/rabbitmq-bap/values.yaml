@@ -1,6 +1,7 @@
 # Helm chart values
-# image: 
-#   repository: bitnamilegacy/rabbitmq
+image: 
+  repository: bitnami/rabbitmq
+  tag: latest
 global:
   storageClass: "longhorn"
 persistence:
