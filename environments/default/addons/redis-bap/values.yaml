@@ -9,7 +9,7 @@ master:
   persistence: 
     size: 1Gi
   persistentVolumeClaimRetentionPolicy:
-    enabled: enabled
+    enabled: true
     whenScaled: Retain
     whenDeleted: Delete
 replica:
