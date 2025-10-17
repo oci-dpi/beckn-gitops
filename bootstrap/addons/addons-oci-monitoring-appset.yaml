@@ -53,6 +53,8 @@ spec:
                   compartmentId: {{metadata.annotations.oke_cluster_compartment_id}}
                 mgmtagent: 
                   installKeyFileContent: {{metadata.annotations.mgmt_agent_rsp_cnt}}
+                  image:
+                    url: container-registry.oracle.com/oci_observability_management/oci-management-agent:1.7.0
       destination:
         namespace: '{{values.addonChartRepositoryNamespace}}'
         name: '{{name}}'
