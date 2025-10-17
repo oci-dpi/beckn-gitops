@@ -1,0 +1,65 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: addons-oci-monitoring
+spec:
+  syncPolicy:
+    preserveResourcesOnDeletion: false
+  generators:
+    - merge:
+        mergeKeys: [server]
+        generators:
+          - clusters:
+              values:
+                addonChart: oci-monitoring
+                # anything not staging or prod use this version
+                addonChartVersion: 4.0.0
+                addonChartRepositoryNamespace: oci-onm
+              selector:
+                matchExpressions:
+                  - key: enable_oci_monitoring
+                    operator: In
+                    values: ['true']
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: dev
+              values:
+                addonChartVersion: 4.0.0
+  template:
+    metadata:
+      name: '{{values.addonChart}}'
+    spec:
+      project: default
+      sources:
+        - repoURL: '{{metadata.annotations.addons_repo_url}}'
+          targetRevision: '{{metadata.annotations.addons_repo_revision}}'
+          ref: values
+        - path: bootstrap/oci/{{values.addonChart}}/oci-nm
+          repoURL: '{{metadata.annotations.addons_repo_url}}'
+          targetRevision: '{{metadata.annotations.addons_repo_revision}}'
+          helm:
+            releaseName: '{{values.addonChart}}'
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
+            values: |
+              global: 
+                kubernetesClusterID: {{metadata.annotations.oke_cluster_id}}
+                kubernetesClusterName: {{metadata.annotations.cluster_name}}
+              oci-onm-mgmt-agent:
+                kubernetesCluster:
+                  compartmentId: {{metadata.annotations.oke_cluster_compartment_id}}
+                mgmtagent: 
+                  installKeyFileContent: {{metadata.annotations.mgmt_agent_rsp_cnt}}
+      destination:
+        namespace: '{{values.addonChartRepositoryNamespace}}'
+        name: '{{name}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true  # Big CRDs.
