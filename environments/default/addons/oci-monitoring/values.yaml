@@ -29,12 +29,7 @@ oci-onm-logan:
   kubernetesClusterName: "{{ .Values.global.kubernetesClusterName }}"
   image:
     url: container-registry.oracle.com/oci_observability_management/oci-la-fluentd-collector:1.7.0
-  # Go to OCI Logging Analytics Administration, click Service Details, and note the namespace value.
-  ociLANamespace: ""
-  # OCI Logging Analytics Default Log Group OCID
-  ociLALogGroupID: ""
-  # OCI Logging Analytics Entity OCID representing the target cluster
-  ociLAClusterEntityID: ""
+
   # This parameter is required only for realms where the OCI Ruby SDK is not supported.
   # Format: <oci-region>.oci.<oci_domain>
   # Example: us-ashburn-1.oci.oraclecloud.com

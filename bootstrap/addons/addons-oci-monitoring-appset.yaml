@@ -48,6 +48,10 @@ spec:
               global: 
                 kubernetesClusterID: {{metadata.annotations.oke_cluster_id}}
                 kubernetesClusterName: {{metadata.annotations.cluster_name}}
+              oci-onm-logan:
+                ociLANamespace: {{metadata.annotations.log_analysis_namespace}}
+                ociLALogGroupID: {{metadata.annotations.log_group_id}}
+                ociLAClusterEntityID: {{metadata.annotations.log_analytics_entity_id}}
               oci-onm-mgmt-agent:
                 kubernetesCluster:
                   compartmentId: {{metadata.annotations.oke_cluster_compartment_id}}
