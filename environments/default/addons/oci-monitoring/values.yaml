@@ -20,7 +20,7 @@ oci-onm-common:
   serviceAccount: "{{ .Values.global.resourceNamePrefix }}"
 
 oci-onm-logan:
-  enabled: false
+  enabled: true
   oci-onm-common:
     enabled: false
   namespace: "{{ .Values.global.namespace }}"
