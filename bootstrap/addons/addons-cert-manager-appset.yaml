@@ -19,7 +19,7 @@ spec:
                 addonChartRepository: https://charts.jetstack.io
               selector:
                 matchExpressions:
-                  - key: enable_cert_manager
+                  - key: enable_cert_manager_disabled
                     operator: In
                     values: ['true']
           - clusters:
