@@ -18,7 +18,7 @@ spec:
                 addonChartRepository: https://charts.bitnami.com/bitnami
               selector:
                 matchExpressions:
-                  - key: enable_beckn
+                  - key: enable_beckn_bbp_mongo
                     operator: In
                     values: ['true']
           - clusters:
