@@ -19,7 +19,7 @@ spec:
                 addonChartRepository: https://dn13.gitlab.io/cert-manager-webhook-oci
               selector:
                 matchExpressions:
-                  - key: enable_cert_manager_disabled
+                  - key: enable_cert_manager
                     operator: In
                     values: ['true']
           - clusters:
