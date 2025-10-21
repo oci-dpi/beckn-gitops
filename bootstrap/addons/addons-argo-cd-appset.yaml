@@ -36,7 +36,7 @@ spec:
                 addonChartVersion: 8.6.1
   template:
     metadata:
-      name: '{{values.addonChart}}'
+      name: argocd
       annotations:
         argocd.argoproj.io/manifest-generate-paths: .
     spec:
