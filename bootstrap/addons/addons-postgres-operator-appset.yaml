@@ -20,7 +20,7 @@ spec:
                 addonChartRepository: https://cloudnative-pg.github.io/charts
               selector:
                 matchExpressions:
-                  - key: enable_beckn_pg_operator
+                  - key: enable_beckn
                     operator: In
                     values: ['true']
           - clusters:
