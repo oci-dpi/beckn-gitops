@@ -19,7 +19,7 @@ spec:
                 addonChartRepository: https://kubernetes-sigs.github.io/external-dns
               selector:
                 matchExpressions:
-                  - key: enable_external_dns_disable
+                  - key: enable_external_dns
                     operator: In
                     values: ['true']
           - clusters:
