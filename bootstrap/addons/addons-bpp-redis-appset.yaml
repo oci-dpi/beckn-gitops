@@ -18,7 +18,7 @@ spec:
                 addonChartRepository: https://charts.bitnami.com/bitnami
               selector:
                 matchExpressions:
-                  - key: enable_beckn_bap_redis
+                  - key: enable_beckn
                     operator: In
                     values: ['true']
           - clusters:
