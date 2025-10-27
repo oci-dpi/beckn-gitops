@@ -11,6 +11,6 @@ dependencies:
 - name: mongodb
   version: 18.0.7
   repository: https://charts.bitnami.com/bitnami
-# - name: rabbitmq
-#   version: 16.0.14
-#   repository: https://charts.bitnami.com/bitnami
+- name: rabbitmq
+  version: 16.0.14
+  repository: https://charts.bitnami.com/bitnami
