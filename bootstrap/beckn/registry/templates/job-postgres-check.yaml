@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: check-postgres-readiness
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      containers:
+      - name: postgres-checker
+        image: jbergknoff/postgresql-client
+        command:
+          - 'sh'
+          - '-c'
+          - 'until pg_isready -U ${DB_USERNAME} -h ${DB_HOSTNAME} -p ${DB_PORT:-5432} -d ${DB_DBNAME:-registry}; do sleep 3; done'
+        env: 
+          - name: DB_HOSTNAME
+            value: {{ .Values.database.host }}
+          - name: DB_USERNAME
+            value: {{ .Values.database.username }}
+          - name: DB_DBNAME
+            value: {{ .Values.database.password }}
+      restartPolicy: Never
+  backoffLimit: 4

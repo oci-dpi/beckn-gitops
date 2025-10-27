@@ -18,7 +18,7 @@ spec:
                 addonChartRepositoryNamespace: registry
               selector:
                 matchExpressions:
-                  - key: enable_beckn_registry
+                  - key: enable_beckn
                     operator: In
                     values: ['true']
           - clusters:
