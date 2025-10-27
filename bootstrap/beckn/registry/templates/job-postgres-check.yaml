@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: postgres-checker
-        image: jbergknoff/postgresql-client
+        image: docker.io/jbergknoff/postgresql-client
         command:
           - 'sh'
           - '-c'
