@@ -1,6 +1,6 @@
 local/
-*.tgz
-Chart.lock
+# *.tgz
+# Chart.lock
 .DS_Store
 
 .aider*

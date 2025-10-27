@@ -1,0 +1,12 @@
+dependencies:
+- name: oci-onm-common
+  repository: file://../common
+  version: 3.1.0
+- name: oci-onm-logan
+  repository: file://../logan
+  version: 4.0.0
+- name: oci-onm-mgmt-agent
+  repository: file://../mgmt-agent
+  version: 3.0.4
+digest: sha256:1e3853d982e00030eb23135a95ea9910df35fcbb85f9dd6656430253080ba3fe
+generated: "2025-05-29T19:56:13.440946+05:30"
