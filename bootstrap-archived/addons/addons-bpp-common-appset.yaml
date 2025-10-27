@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: addons-postgres-cluster
+  name: addons-bpp-common
 spec:
   syncPolicy:
     preserveResourcesOnDeletion: false
@@ -12,10 +12,10 @@ spec:
         generators:
           - clusters:
               values:
-                addonChart: postgres-cluster
+                addonChart: bpp-common
                 # anything not staging or prod use this version
-                addonChartVersion: 0.3.1
-                addonChartRepositoryNamespace: postgres
+                addonChartVersion: 0.1.0
+                addonChartRepositoryNamespace: bpp-common
               selector:
                 matchExpressions:
                   - key: enable_beckn
@@ -26,13 +26,10 @@ spec:
                 matchLabels:
                   environment: dev
               values:
-                addonChartVersion: 0.3.1
+                addonChartVersion: 0.1.0
   template:
     metadata:
       name: '{{values.addonChart}}'
-      annotations:
-        argocd.argoproj.io/sync-wave: "-5"  
-        argocd.argoproj.io/manifest-generate-paths: .
     spec:
       project: default
       sources:
@@ -48,8 +45,22 @@ spec:
             valueFiles:
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
             values: |
-              pg_super_password: '{{metadata.annotations.pg_super_password}}'
-              pg_db_password: '{{metadata.annotations.pg_db_password}}'
+              mongodb: 
+                auth:
+                  enabled: true
+                  rootUser: "{{ metadata.annotations.bpp_mongo_auth_username }}"
+                  rootPassword: "{{ metadata.annotations.bpp_mongo_auth_password }}"
+                  usernames:
+                    - "{{ metadata.annotations.bpp_mongo_username }}"
+                  passwords:
+                    - "{{ metadata.annotations.bpp_mongo_password }}"
+                  databases:
+                    - "protocol_server" 
+              rabbitmq: 
+                auth:
+                  username: "{{ metadata.annotations.bap_rabbitmq_username }}" 
+                  password: "{{ metadata.annotations.bap_rabbitmq_password }}"
+                  securePassword: false 
       destination:
         namespace: '{{values.addonChartRepositoryNamespace}}'
         name: '{{name}}'

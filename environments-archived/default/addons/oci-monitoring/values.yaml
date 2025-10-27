@@ -1,0 +1,51 @@
+# Copyright (c) 2023, 2025, Oracle and/or its affiliates.
+# Licensed under the Universal Permissive License v1.0 as shown at https://oss.oracle.com/licenses/upl.
+
+global:
+  # -- Kubernetes Namespace in which the resources to be created. Set oci-kubernetes-monitoring-common:createNamespace set to true, if the namespace doesn't exist.
+  namespace: oci-onm
+  # -- Prefix to be attached to resources created through this chart. Not all resources may have this prefix.
+  resourceNamePrefix: oci-onm
+
+oci-onm-common:
+  # -- By default, a cluster role, cluster role binding and serviceaccount will be created for the monitoring pods to be able to (readonly) access various objects within the cluster, to support collection of various telemetry data. You may set this to false and provide your own serviceaccount which has the necessary cluster role(s) binded to it. Refer, README for the cluster role definition and other details.
+  createServiceAccount: true
+  # -- If createNamespace is set to true, it tries to create the namespace defined in 'namespace' variable.
+  createNamespace: true
+  # -- Kubernetes Namespace in which the serviceaccount to be created.
+  namespace: "{{ .Values.global.namespace }}"
+  # -- Prefix to be attached to resources created through this chart. Not all resources may have this prefix.
+  resourceNamePrefix: "{{ .Values.global.resourceNamePrefix }}"
+  # -- Name of the Kubernetes ServiceAccount
+  serviceAccount: "{{ .Values.global.resourceNamePrefix }}"
+
+oci-onm-logan:
+  enabled: true
+  oci-onm-common:
+    enabled: false
+  namespace: "{{ .Values.global.namespace }}"
+  serviceAccount: "{{ .Values.global.resourceNamePrefix }}"
+  kubernetesClusterID: "{{ .Values.global.kubernetesClusterID }}"
+  kubernetesClusterName: "{{ .Values.global.kubernetesClusterName }}"
+  image:
+    url: container-registry.oracle.com/oci_observability_management/oci-la-fluentd-collector:1.7.0
+
+  # This parameter is required only for realms where the OCI Ruby SDK is not supported.
+  # Format: <oci-region>.oci.<oci_domain>
+  # Example: us-ashburn-1.oci.oraclecloud.com
+  ociDomain:
+
+oci-onm-mgmt-agent:
+  deployment: 
+    daemonSetDeployment: false
+    daemonSet:
+      # Provide the host path if Agent is deployed as DaemonSet. Management Agent Pod should have read-write access to it.
+      # Note: The hostPath cannot point to /opt/oracle, please provide another location or create a sub-directory under /opt/oracle and use that as hostPath.
+      # The Management Agent helm chart will attempt to change ownership and permissions on the host path provided here.
+      hostPath: /tmp
+  oci-onm-common:
+    enabled: false
+  namespace: "{{ .Values.global.namespace }}"
+  serviceAccount: "{{ .Values.global.resourceNamePrefix }}"
+  kubernetesCluster:
+    name: "{{ .Values.global.kubernetesClusterName }}"

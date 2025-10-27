@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: addons-postgres-cluster
+  name: addons-oci-monitoring
 spec:
   syncPolicy:
     preserveResourcesOnDeletion: false
@@ -12,13 +12,13 @@ spec:
         generators:
           - clusters:
               values:
-                addonChart: postgres-cluster
+                addonChart: oci-monitoring
                 # anything not staging or prod use this version
-                addonChartVersion: 0.3.1
-                addonChartRepositoryNamespace: postgres
+                addonChartVersion: 4.0.0
+                addonChartRepositoryNamespace: oci-onm
               selector:
                 matchExpressions:
-                  - key: enable_beckn
+                  - key: enable_oci_monitoring
                     operator: In
                     values: ['true']
           - clusters:
@@ -26,20 +26,17 @@ spec:
                 matchLabels:
                   environment: dev
               values:
-                addonChartVersion: 0.3.1
+                addonChartVersion: 4.0.0
   template:
     metadata:
       name: '{{values.addonChart}}'
-      annotations:
-        argocd.argoproj.io/sync-wave: "-5"  
-        argocd.argoproj.io/manifest-generate-paths: .
     spec:
       project: default
       sources:
         - repoURL: '{{metadata.annotations.addons_repo_url}}'
           targetRevision: '{{metadata.annotations.addons_repo_revision}}'
           ref: values
-        - path: bootstrap/beckn/{{values.addonChart}}
+        - path: bootstrap/oci/{{values.addonChart}}/oci-onm
           repoURL: '{{metadata.annotations.addons_repo_url}}'
           targetRevision: '{{metadata.annotations.addons_repo_revision}}'
           helm:
@@ -48,8 +45,20 @@ spec:
             valueFiles:
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
             values: |
-              pg_super_password: '{{metadata.annotations.pg_super_password}}'
-              pg_db_password: '{{metadata.annotations.pg_db_password}}'
+              global: 
+                kubernetesClusterID: {{metadata.annotations.oke_cluster_id}}
+                kubernetesClusterName: {{metadata.annotations.cluster_name}}
+              oci-onm-logan:
+                ociLANamespace: {{metadata.annotations.log_analysis_namespace}}
+                ociLALogGroupID: {{metadata.annotations.log_group_id}}
+                ociLAClusterEntityID: {{metadata.annotations.log_analytics_entity_id}}
+              oci-onm-mgmt-agent:
+                kubernetesCluster:
+                  compartmentId: {{metadata.annotations.oke_cluster_compartment_id}}
+                mgmtagent: 
+                  installKeyFileContent: {{metadata.annotations.mgmt_agent_rsp_cnt}}
+                  image:
+                    url: container-registry.oracle.com/oci_observability_management/oci-management-agent:1.7.0
       destination:
         namespace: '{{values.addonChartRepositoryNamespace}}'
         name: '{{name}}'

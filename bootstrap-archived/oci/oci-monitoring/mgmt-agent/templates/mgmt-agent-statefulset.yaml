@@ -1,0 +1,98 @@
+# Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+# Licensed under the Universal Permissive License v1.0 as shown at https://oss.oracle.com/licenses/upl.
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "mgmt-agent.resourceNamePrefix" . }}-mgmt-agent
+  namespace: {{ include "mgmt-agent.namespace" . }}
+  labels:
+    app: {{ include "mgmt-agent.resourceNamePrefix" . }}-mgmt-agent
+spec:
+  serviceName: {{ include "mgmt-agent.resourceNamePrefix" . }}-mgmt-agent
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "mgmt-agent.resourceNamePrefix" . }}-mgmt-agent
+  template:
+    metadata:
+      annotations:
+        checksum/metrics-configmap: {{ include (print $.Template.BasePath "/metrics-configmap.yaml") . | sha256sum }}
+        checksum/agent-configmap: {{ include (print $.Template.BasePath "/agent-configmap.yaml") . | sha256sum }}
+        checksum/env-configmap: {{ include (print $.Template.BasePath "/env-configmap.yaml") . | sha256sum }}
+      labels:
+        app: {{ include "mgmt-agent.resourceNamePrefix" . }}-mgmt-agent
+    spec:
+      securityContext:
+        runAsUser: {{ default 0 .Values.deployment.security.runAsUser }}
+        runAsGroup: {{ default 0 .Values.deployment.security.runAsGroup }}
+        fsGroup: {{ default 0 .Values.deployment.security.fsGroup }}
+      serviceAccountName: {{ include "mgmt-agent.serviceAccount" . }}
+      {{- if .Values.mgmtagent.image.secret }}
+      imagePullSecrets:
+        - name: {{ include "mgmt-agent.resourceNamePrefix" . }}-mgmt-agent-container-registry-key
+      {{- end }}
+      restartPolicy: Always
+      containers:
+        - name: {{ include "mgmt-agent.resourceNamePrefix" . }}-mgmt-agent
+          image: {{ .Values.mgmtagent.image.url }}
+          envFrom:
+          - configMapRef:
+              name: {{ include "mgmt-agent.resourceNamePrefix" . }}-env
+          env:
+            {{- if .Values.mgmtagent.extraEnv }}
+            {{- range .Values.mgmtagent.extraEnv }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+            {{- end }}
+            {{- end }}
+          resources:
+            requests:
+              cpu: {{ .Values.deployment.resource.request.cpuCore }}
+              memory: {{ .Values.deployment.resource.request.memory }}
+            limits:
+              cpu: {{ .Values.deployment.resource.limit.cpuCore }}
+              memory: {{ .Values.deployment.resource.limit.memory }}
+          volumeMounts:
+            - name: mgmtagent-secret
+              mountPath: /opt/oracle/mgmtagent_secret
+              readOnly: true
+            - name: mgmtagent-pvc
+              mountPath: /opt/oracle
+            - name: mgmtagent-config
+              mountPath: /opt/oracle/mgmtagent_config
+            - name: mgmtagent-env
+              mountPath: /opt/oracle/mgmtagent_env
+            - name: mgmtagent-agent-config
+              mountPath: /opt/oracle/mgmtagent_agent_config
+            - mountPath: /tmp
+              name: tmp
+          securityContext:
+           allowPrivilegeEscalation: false
+           readOnlyRootFilesystem: true
+      volumes:
+        - name: mgmtagent-secret
+          secret:
+            secretName: {{ include "mgmt-agent.resourceNamePrefix" . }}-mgmt-agent-rsp
+        - name: mgmtagent-config
+          configMap:
+            name: {{ include "mgmt-agent.resourceNamePrefix" . }}-metrics
+        - name: mgmtagent-env
+          configMap:
+            name: {{ include "mgmt-agent.resourceNamePrefix" . }}-env
+        - name: mgmtagent-agent-config
+          configMap:
+            name: {{ include "mgmt-agent.resourceNamePrefix" . }}-agent
+        - emptyDir: {}
+          name: tmp
+  volumeClaimTemplates:
+    - metadata:
+        name: mgmtagent-pvc
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        {{- if .Values.deployment.storageClass }}
+        storageClassName: {{ .Values.deployment.storageClass }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.deployment.resource.request.storage }}

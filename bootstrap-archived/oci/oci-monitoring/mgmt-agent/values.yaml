@@ -1,0 +1,114 @@
+# Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+# Licensed under the Universal Permissive License v1.0 as shown at https://oss.oracle.com/licenses/upl.
+
+global:
+  # -- Kubernetes Namespace in which the resources to be created. Set oci-kubernetes-monitoring-common:createNamespace set to true, if the namespace doesn't exist.
+  namespace: oci-onm
+  # -- Prefix to be attached to resources created through this chart. Not all resources may have this prefix.
+  resourceNamePrefix: oci-onm
+
+oci-onm-common:
+  # -- By default, a cluster role, cluster role binding and serviceaccount will be created for the monitoring pods to be able to (readonly) access various objects within the cluster, to support collection of various telemetry data. You may set this to false and provide your own serviceaccount (in the parent chart(s)) which has the necessary cluster role(s) binded to it. Refer, README for the cluster role definition and other details.
+  createServiceAccount: true
+  # -- If createNamespace is set to true, it tries to create the namespace defined in 'namespace' variable.
+  createNamespace: true
+  # -- Kubernetes Namespace in which the serviceaccount to be created.
+  namespace: "{{ .Values.global.namespace }}"
+  # -- Prefix to be attached to resources created through this chart. Not all resources may have this prefix.
+  resourceNamePrefix: "{{ .Values.global.resourceNamePrefix }}"
+  # -- Name of the Kubernetes ServiceAccount
+  serviceAccount: "{{ .Values.global.resourceNamePrefix }}"
+
+mgmtagent:
+   # Provide either installKeyFileContent or installKey as an install key. If both provided then installKeyFileContent will take higher precedence.
+
+   # -- Provide the base64 encoded content of the Management Agent Install Key file (e.g. cat input.rsp | base64 -w 0)
+   installKeyFileContent:
+   # -- Copy the downloaded Management Agent Install Key file under root helm directory as resources/input.rsp
+   installKey: resources/input.rsp
+   # Follow steps documented at https://github.com/oracle/docker-images/tree/main/OracleManagementAgent to build docker image.
+   image:
+      # -- Replace this value with actual docker image URL for Management Agent
+      url:
+      # -- Image secrets to use for pulling container image (base64 encoded content of ~/.docker/config.json file)
+      secret:
+   # Please specify additional environment variables in name:value pairs
+   extraEnv:
+      # Openjdk on RHEL with FIPS requires the default security property to be disabled, 
+      # so that Management Agent can use its own bcfips security provider.
+      # Set this to true to disable, and pass disableJREDefaultSecurityPropertiesFile=true via the rsp file.
+      - name: DISABLE_JRE_DEFAULT_SECURITY_PROPERTIES_FILE
+        value: "false"
+
+# -- Kubernetes namespace to create and install this helm chart in
+namespace: "{{ .Values.global.namespace }}"
+
+# -- Name of the Kubernetes ServiceAccount
+serviceAccount: "{{ .Values.global.resourceNamePrefix }}"
+
+# -- By default, metric server will be deployed and used by Management Agent to collect metrics. You can set this to false if you already have metric server installed on your cluster
+deployMetricServer: true
+
+# Kubernetes Cluster details to monitor
+kubernetesCluster:
+   # -- OCI Compartment Id to push Kubernetes Monitoring metrics. If not specified default is same as Agent compartment
+   compartmentId:
+   # -- Kubernetes cluster name
+   name:
+   # -- Kubernetes cluster namespace(s) to monitor. This can be a comma-separated list of namespaces or '*' to monitor all the namespaces
+   namespace: '*'
+   # -- OCI namespace to push Kubernetes Monitoring metrics. The namespace should match the pattern '^[a-z][a-z0-9_]*[a-z0-9]$'. By default metrics will be pushed to 'mgmtagent_kubernetes_metrics'
+   monitoringNamespace:
+   # -- Provide the specific list of comma separated metric names for API server (/metrics) metrics to be collected.
+   overrideAllowMetricsAPIServer:
+   # -- Provide the specific list of comma separated metric names for agent computed metrics to be collected.
+   overrideAllowMetricsCluster:
+   # -- Provide the specific list of comma separated metric names for Kubelet (/api/v1/nodes/<node_name>/proxy/metrics) metrics to be collected.
+   overrideAllowMetricsKubelet:
+   # -- Provide the specific list of comma separated metric names for Node (/api/v1/nodes/<node_name>/proxy/metrics/resource, /api/v1/nodes/<node_name>/proxy/metrics/cadvisor) metrics to be collected.
+   overrideAllowMetricsNode:
+
+deployment:
+   security:
+      # Processes in the Container will run as user ID 1000, replace it with a different value if desired
+      runAsUser: 1000
+      # Processes in the Container will use group ID 2000, replace it with a different value if desired
+      runAsGroup: 2000
+      # Files created in the Container will use group ID 2000, replace it with a different value if desired
+      fsGroup: 2000
+
+   # Please provide the current epoch time in seconds (Eg: Executing the following command in a bash shell will provide the epoch time: "date +%s") to clean up the agent installation directory from previous deployment
+   cleanupEpochTime:
+
+   # Setting the daemonset deployment to true, will deploy the Management Agents as a daemonset in addition to deploying the Management Agent as a statefulset. This is done to to distribute the node metrics collection to agents running on the node
+   daemonSetDeployment: false
+   
+   daemonSet:
+      # Provide the host path if Agent is deployed as DaemonSet. Management Agent Pod should have read-write access to it.
+      # Note: The hostPath cannot point to /opt/oracle, please provide another location or create a sub-directory under /opt/oracle and use that as hostPath.
+      # The Management Agent helm chart will attempt to change ownership and permissions on the host path provided here.
+      hostPath:
+      # Override the ownership and permissions on the hostPath. The hostPath will be owned by the runAsUser and runAsGroup provided under security context above and the permission as 750. 
+      # Note: This requires oraclelinux:8-slim image
+      # Setting overrideOwnership to false will disable the ownership change.
+      overrideOwnership: true
+
+   # Provide the agent resources as per Kubernetes resource quantity
+   resource:
+      # Provide the minimum required resources
+      request:
+         # specify the cpu cores
+         cpuCore: 200m
+         # specify the memory
+         memory: 500Mi
+         # specify the storage capacity for StatefulSet's PVC
+         storage: 2Gi
+      # Provide the maximum limit for resources
+      limit:
+         # specify the cpu cores
+         cpuCore: 500m
+         # specify the memory
+         memory: 1Gi
+   
+   # Provide the storage class for StatefulSet's PVC. If not provided then the Cluster's default storage class will be used.
+   storageClass:

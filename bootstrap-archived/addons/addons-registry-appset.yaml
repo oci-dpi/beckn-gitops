@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: addons-postgres-cluster
+  name: addons-registry
 spec:
   syncPolicy:
     preserveResourcesOnDeletion: false
@@ -12,13 +12,13 @@ spec:
         generators:
           - clusters:
               values:
-                addonChart: postgres-cluster
+                addonChart: registry
                 # anything not staging or prod use this version
-                addonChartVersion: 0.3.1
-                addonChartRepositoryNamespace: postgres
+                addonChartVersion: 0.1.0
+                addonChartRepositoryNamespace: registry
               selector:
                 matchExpressions:
-                  - key: enable_beckn
+                  - key: enable_beckn_registry
                     operator: In
                     values: ['true']
           - clusters:
@@ -26,7 +26,7 @@ spec:
                 matchLabels:
                   environment: dev
               values:
-                addonChartVersion: 0.3.1
+                addonChartVersion: 0.1.0
   template:
     metadata:
       name: '{{values.addonChart}}'
@@ -48,8 +48,26 @@ spec:
             valueFiles:
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
             values: |
-              pg_super_password: '{{metadata.annotations.pg_super_password}}'
-              pg_db_password: '{{metadata.annotations.pg_db_password}}'
+              namespace: {{values.addonChartRepositoryNamespace}}
+              externalDomain: registry-beckn.{{ metadata.annotations.domain }}
+              ingress:
+                enabled: true
+                annotations: 
+                  cert-manager.io/cluster-issuer: "{{ metadata.annotations.certificate_issuer }}"
+                ingressClassName: nginx
+                hosts:
+                  - host: registry-beckn.{{ metadata.annotations.domain }}
+                    paths:
+                      - /
+                tls:
+                  - hosts:
+                      - registry-beckn.{{ metadata.annotations.domain }}
+                    secretName: beckn-onix-registry-tls
+              database:
+                host: postgres-cluster-rw.postgres
+                dbname: registry
+                username: "{{ metadata.annotations.pg_db_user }}"
+                password: "{{ metadata.annotations.pg_db_password }}"
       destination:
         namespace: '{{values.addonChartRepositoryNamespace}}'
         name: '{{name}}'

@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: addons-postgres-cluster
+  name: addons-cert-manager-webhook-oci
 spec:
   syncPolicy:
     preserveResourcesOnDeletion: false
@@ -12,13 +12,14 @@ spec:
         generators:
           - clusters:
               values:
-                addonChart: postgres-cluster
+                addonChart: cert-manager-webhook-oci
                 # anything not staging or prod use this version
-                addonChartVersion: 0.3.1
-                addonChartRepositoryNamespace: postgres
+                addonChartVersion: 1.2.1
+                addonChartRepositoryNamespace: cert-manager
+                addonChartRepository: https://dn13.gitlab.io/cert-manager-webhook-oci
               selector:
                 matchExpressions:
-                  - key: enable_beckn
+                  - key: enable_cert_manager
                     operator: In
                     values: ['true']
           - clusters:
@@ -26,12 +27,17 @@ spec:
                 matchLabels:
                   environment: dev
               values:
-                addonChartVersion: 0.3.1
+                addonChartVersion: 1.2.1
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: prod
+              values:
+                addonChartVersion: 1.2.1
   template:
     metadata:
       name: '{{values.addonChart}}'
       annotations:
-        argocd.argoproj.io/sync-wave: "-5"  
         argocd.argoproj.io/manifest-generate-paths: .
     spec:
       project: default
@@ -39,17 +45,15 @@ spec:
         - repoURL: '{{metadata.annotations.addons_repo_url}}'
           targetRevision: '{{metadata.annotations.addons_repo_revision}}'
           ref: values
-        - path: bootstrap/beckn/{{values.addonChart}}
-          repoURL: '{{metadata.annotations.addons_repo_url}}'
-          targetRevision: '{{metadata.annotations.addons_repo_revision}}'
+        - chart: '{{values.addonChart}}'
+          repoURL: '{{values.addonChartRepository}}'
+          targetRevision: '{{values.addonChartVersion}}'
           helm:
             releaseName: '{{values.addonChart}}'
             ignoreMissingValueFiles: true
             valueFiles:
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
-            values: |
-              pg_super_password: '{{metadata.annotations.pg_super_password}}'
-              pg_db_password: '{{metadata.annotations.pg_db_password}}'
+              - $values/{{metadata.annotations.addons_repo_basepath}}environments/{{metadata.labels.environment}}/addons/{{values.addonChart}}/values.yaml
       destination:
         namespace: '{{values.addonChartRepositoryNamespace}}'
         name: '{{name}}'
@@ -59,4 +63,4 @@ spec:
           selfHeal: true
         syncOptions:
           - CreateNamespace=true
-          # - ServerSideApply=true  # Big CRDs.
+          - ServerSideApply=true  # Big CRDs.
