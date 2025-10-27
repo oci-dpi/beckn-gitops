@@ -15,7 +15,7 @@ spec:
         command:
           - 'sh'
           - '-c'
-          - 'until pg_isready -U ${DB_USERNAME} -h ${DB_HOSTNAME} -p ${DB_PORT:-5432} -d ${DB_DBNAME:-registry}; do sleep 3; done'
+          - 'until pg_isready -U ${DB_USERNAME} -h ${DB_HOSTNAME} -p ${DB_PORT:-5432} -d ${DB_DBNAME:-gateway}; do sleep 3; done'
         env: 
           - name: DB_HOSTNAME
             value: {{ .Values.database.host }}
