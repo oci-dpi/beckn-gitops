@@ -18,7 +18,7 @@ spec:
                 addonChartRepositoryNamespace: bpp-common
               selector:
                 matchExpressions:
-                  - key: enable_beckn_disabled
+                  - key: enable_beckn
                     operator: In
                     values: ['true']
           - clusters:
