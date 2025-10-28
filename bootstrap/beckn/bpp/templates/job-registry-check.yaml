@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: check-registry-readiness
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      containers:
+      - name: readiness-check
+        image: docker.io/curlimages/curl:latest
+        command: ["sh", "-c"]
+        args:
+          - |
+            while true; do
+              echo "Checking readiness of registry service...";
+              if curl -sfk {{ .Values.global.registry_url }}/; then
+                echo "Service is ready!";
+                exit 0;
+              else
+                echo "Service is not ready, retrying in 5 seconds...";
+                sleep 5;
+              fi
+            done
+      restartPolicy: Never
+  backoffLimit: 10

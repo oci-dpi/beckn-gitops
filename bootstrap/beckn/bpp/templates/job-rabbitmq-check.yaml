@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: check-rabbitmq-readiness
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      containers:
+        - name: rabbitmq-readiness-check
+          image: docker.io/rabbitmq:3-management-alpine
+          command: ["sh", "-c"]
+          args:
+            - |
+              HOST="{{ .Values.global.rabbitMQamqp.host | default "bpp-common-rabbitmq.bpp-common" }}"
+              PORT="{{ .Values.global.rabbitMQamqp.port | default "5672" }}"
+              echo "Checking readiness of RabbitMQ at $HOST:$PORT..."
+              while true; do
+                if nc -z "$HOST" "$PORT"; then
+                  echo "✅ RabbitMQ is ready (TCP connection successful)!"
+                  exit 0
+                else
+                  echo "❌ RabbitMQ not reachable, retrying in 5 seconds..."
+                  sleep 5
+                fi
+              done
+      restartPolicy: Never
+  backoffLimit: 10

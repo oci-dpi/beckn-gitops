@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: register-bpp-subscriber
+  namespace: {{ .Values.global.namespace }}
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    # argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: register-bpp
+        image: docker.io/curlimages/curl:latest
+        command: ["sh", "-c"]
+        args:
+          - |
+            echo "Registering bpp subscriber with registry {{ .Values.global.registry_url }}..."
+            
+            curl --fail --location --request POST "https://{{ .Values.global.registry_url }}/subscribers/register" \
+              --header "Content-Type: application/json" \
+              --data-raw '{
+                "subscriber_id": "{{ .Values.global.externalDomain }}",
+                "pub_key_id": "{{ .Values.global.bpp.publicKey }}",
+                "unique_key_id": "{{ .Values.global.externalDomain }}.k1",
+                "subscriber_url": "https://{{ .Values.global.externalDomain }}",
+                "domain": " ",
+                "extended_attributes": {"domains": []},
+                "encr_public_key": "{{ .Values.global.bpp.publicKey }}",
+                "signing_public_key": "{{ .Values.global.bpp.publicKey }}",
+                "valid_from": "{{ now | date "2006-01-02T15:04:05Z07:00" }}",
+                "valid_until": "{{ now | dateModify "+26280h" | date "2006-01-02T15:04:05Z07:00" }}",
+                "type": "BPP",
+                "country": "IND",
+                "status": "SUBSCRIBED"
+              }' \
+              --silent --show-error --write-out "\nHTTP Status: %{http_code}\n" || exit 1
+
+            echo "✅ bpp subscriber registration completed successfully!"

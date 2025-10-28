@@ -1,0 +1,7 @@
+global:
+  image:
+    repository: docker.io/fidedocker/protocol-server
+    pullPolicy: IfNotPresent
+  persistence:
+    storageClassName: longhorn
+    size: 1Gi

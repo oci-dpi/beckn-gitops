@@ -1,0 +1,87 @@
+# Default values for registry.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  namespace: bpp
+  image:
+    repository: docker.io/fidedocker/protocol-server
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    # tag: ""
+
+# Redis connection details
+  redisCache:
+    host: redis-master.bpp-common-services.svc.cluster.local
+    port: 6379
+
+# Mongodb connection details
+  responseCacheMongo:
+    host: mongodb.bpp-common-services.svc.cluster.local
+    port: 27017
+    dbname: protocol_server
+    username: root
+    password: 
+
+# RabbitMQ connection details
+  rabbitMQamqp:
+    host: rabbitmq.bpp-common-services.svc.cluster.local
+    port: 5672
+    username: beckn
+    password: 
+
+
+
+  # Must be set while installing Helm chart
+  externalDomain: bpp-network.example.com
+  registry_url:  registry.example.com
+  bpp:
+    privateKey: "private-key"
+    publicKey: "public-key"
+
+
+# BPP subscribe_id. Default to externalDomain value.
+  subscriber_id:
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+      
+  ## Storage class with read write many supported e.g longhorn
+  persistence:
+    storageClassName: 
+    size: 1Gi
+
+bpp-network:
+  ingress:
+    enabled: true
+    annotations: {}
+    ingressClassName: nginx
+    hosts:
+      - host: bpp-network.example.com
+        paths:
+          - /
+    tls:
+      - hosts:
+          - bpp-network.example.com
+        secretName: myapp-tls
+
+bpp-client:
+  ingress:
+    enabled: true
+    annotations: {}
+    ingressClassName: nginx
+    hosts:
+      - host: bpp-client.example.com
+        paths:
+          - /
+    tls:
+      - hosts:
+          - bpp-client.example.com
+        secretName: myapp-tls
