@@ -39,6 +39,14 @@ spec:
           volumeMounts:
             - name: bap-schemas-efs-volume
               mountPath: /mnt/schemas
+        - name: copy-layer2-schemas
+          image: {{ .Values.global.image.repository }}
+          command: ['sh', '-c', 'cp -r /config-schemas/* /mnt/schemas/ || true']
+          volumeMounts:
+            - name: configmap-schemas
+              mountPath: /config-schemas
+            - name: bap-schemas-efs-volume
+              mountPath: /mnt/schemas
       containers:
         - name: {{ .Chart.Name }}
           image: {{ .Values.global.image.repository }}
@@ -78,3 +86,6 @@ spec:
         - name: bap-network-logs-ebs-volume
           persistentVolumeClaim:
             claimName: {{ include "common.name" . }}-logs-pvc
+        - name: configmap-schemas
+          configMap:
+            name: {{ include "common.name" . }}-schemas
