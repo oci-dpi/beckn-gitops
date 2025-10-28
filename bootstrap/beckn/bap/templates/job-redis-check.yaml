@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: check-redis-readiness
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      containers:
+        - name: redis-readiness-check
+          image: redis:7-alpine
+          command: ["sh", "-c"]
+          args:
+            - |
+              HOST="{{ .Values.global.redisCache.host | default "bap-common-redis-master.bap-common" }}"
+              PORT="{{ .Values.global.redisCache.port | default "6379" }}"
+              echo "Checking readiness of Redis at $HOST:$PORT..."
+              while true; do
+                if redis-cli -h "$HOST" -p "$PORT" ping | grep -q "PONG"; then
+                  echo "✅ Redis is ready!"
+                  exit 0
+                else
+                  echo "❌ Redis not ready, retrying in 5 seconds..."
+                  sleep 5
+                fi
+              done
+      restartPolicy: Never
+  backoffLimit: 10

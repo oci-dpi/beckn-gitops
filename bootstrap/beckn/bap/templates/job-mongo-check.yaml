@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: check-mongodb-readiness
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      containers:
+        - name: mongodb-readiness-check
+          image: mongo:7
+          command: ["sh", "-c"]
+          args:
+            - |
+              HOST="{{ .Values.global.responseCacheMongo.host | default "bap-common-mongodb.bap-common" }}"
+              PORT="{{ .Values.global.responseCacheMongo.port | default "27017" }}"
+              echo "Checking readiness of MongoDB at $HOST:$PORT..."
+              while true; do
+                if mongosh --quiet --host "$HOST" --port "$PORT" --eval "db.runCommand({ ping: 1 })" | grep -q "ok"; then
+                  echo "✅ MongoDB is ready!"
+                  exit 0
+                else
+                  echo "❌ MongoDB not ready, retrying in 5 seconds..."
+                  sleep 5
+                fi
+              done
+      restartPolicy: Never
+  backoffLimit: 10

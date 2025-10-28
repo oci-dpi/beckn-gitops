@@ -18,7 +18,7 @@ spec:
                 addonChartRepositoryNamespace: bap
               selector:
                 matchExpressions:
-                  - key: enable_beckn_disable
+                  - key: enable_beckn
                     operator: In
                     values: ['true']
           - clusters:
@@ -51,16 +51,16 @@ spec:
               global:
                 namespace: {{values.addonChartRepositoryNamespace}}
                 redisCache:
-                  host: bap-common-redis-master.bap-common-services.svc.cluster.local
+                  host: bap-common-redis-master.bap-common.svc.cluster.local
                   port: 6379
                 responseCacheMongo:
-                  host: bap-common-mongodb.bap-common-services.svc.cluster.local
+                  host: bap-common-mongodb.bap-common.svc.cluster.local
                   port: 27017
                   dbname: protocol_server
                   username: "{{ metadata.annotations.bpp_mongo_auth_username }}"
                   password: "{{ metadata.annotations.bpp_mongo_auth_password }}"
                 rabbitMQamqp:
-                  host: bap-common-rabbitmq.bap-common-services.svc.cluster.local
+                  host: bap-common-rabbitmq.bap-common.svc.cluster.local
                   port: 5672
                   username: "{{ metadata.annotations.bap_rabbitmq_username }}"
                   password: "{{ metadata.annotations.bap_rabbitmq_password }}"

@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: check-rabbitmq-readiness
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      containers:
+        - name: rabbitmq-readiness-check
+          image: rabbitmq:3-management-alpine
+          command: ["sh", "-c"]
+          args:
+            - |
+              HOST="{{ .Values.global.rabbitMQamqp.host | default "bap-common-rabbitmq.bap-common" }}"
+              PORT="{{ .Values.global.rabbitMQamqp.port | default "5672" }}"
+              echo "Checking readiness of RabbitMQ at $HOST:$PORT..."
+              while true; do
+                # Try connecting to AMQP port (5672)
+                if nc -z "$HOST" "$PORT"; then
+                  echo "✅ RabbitMQ TCP port is reachable!"
+                  # Perform an internal ping check (optional)
+                  if rabbitmq-diagnostics -q ping 2>/dev/null; then
+                    echo "✅ RabbitMQ responded to ping, service is ready!"
+                    exit 0
+                  else
+                    echo "⚠️ TCP OK but internal ping failed, retrying..."
+                  fi
+                else
+                  echo "❌ RabbitMQ not reachable, retrying in 5 seconds..."
+                fi
+                sleep 5
+              done
+      restartPolicy: Never
+  backoffLimit: 10
