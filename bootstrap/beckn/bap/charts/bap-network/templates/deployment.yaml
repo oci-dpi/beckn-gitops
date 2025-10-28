@@ -41,7 +41,12 @@ spec:
               mountPath: /mnt/schemas
         - name: copy-layer2-schemas
           image: {{ .Values.global.image.repository }}
-          command: ['sh', '-c', 'cp -r /config-schemas/* /mnt/schemas/ || true']
+          command:
+            - sh
+            - -c
+            - |
+              echo "Copying schemas from ConfigMap with dereference..."
+              cp -rL /config-schemas/* /mnt/schemas/ || true
           volumeMounts:
             - name: configmap-schemas
               mountPath: /config-schemas
