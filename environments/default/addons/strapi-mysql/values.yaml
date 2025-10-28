@@ -1,0 +1,22 @@
+# Default values for strapi-mysql
+replicaCount: 1
+
+image:
+  repository: docker.io/mysql/mysql-server
+  tag: latest
+  pullPolicy: IfNotPresent
+
+persistence:
+  enabled: true
+  storageClass: longhorn
+  accessMode: ReadWriteOnce
+  size: 1Gi
+
+config:
+  customCnf: |
+    [mysqld]
+    sort_buffer_size = 64M
+
+service:
+  type: ClusterIP
+  port: 3306
