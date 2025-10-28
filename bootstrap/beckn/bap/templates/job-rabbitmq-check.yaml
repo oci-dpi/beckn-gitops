@@ -15,24 +15,17 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
-              HOST="{{ .Values.global.rabbitMQamqp.host | default "bap-common-rabbitmq.bap-common" }}"
-              PORT="{{ .Values.global.rabbitMQamqp.port | default "5672" }}"
+              HOST="{{ .Values.global.rabbitmq_host | default "bap-common-rabbitmq" }}"
+              PORT="{{ .Values.global.rabbitmq_port | default "5672" }}"
               echo "Checking readiness of RabbitMQ at $HOST:$PORT..."
               while true; do
-                # Try connecting to AMQP port (5672)
                 if nc -z "$HOST" "$PORT"; then
-                  echo "✅ RabbitMQ TCP port is reachable!"
-                  # Perform an internal ping check (optional)
-                  if rabbitmq-diagnostics -q ping 2>/dev/null; then
-                    echo "✅ RabbitMQ responded to ping, service is ready!"
-                    exit 0
-                  else
-                    echo "⚠️ TCP OK but internal ping failed, retrying..."
-                  fi
+                  echo "✅ RabbitMQ is ready (TCP connection successful)!"
+                  exit 0
                 else
                   echo "❌ RabbitMQ not reachable, retrying in 5 seconds..."
+                  sleep 5
                 fi
-                sleep 5
               done
       restartPolicy: Never
   backoffLimit: 10
