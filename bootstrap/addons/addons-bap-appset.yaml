@@ -1,0 +1,110 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: addons-bap
+spec:
+  syncPolicy:
+    preserveResourcesOnDeletion: false
+  generators:
+    - merge:
+        mergeKeys: [server]
+        generators:
+          - clusters:
+              values:
+                addonChart: bap
+                # anything not staging or prod use this version
+                addonChartVersion: 0.1.0
+                addonChartRepositoryNamespace: bap
+              selector:
+                matchExpressions:
+                  - key: enable_beckn_diabled
+                    operator: In
+                    values: ['true']
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: dev
+              values:
+                addonChartVersion: 0.1.0
+  template:
+    metadata:
+      name: '{{values.addonChart}}'
+      annotations:
+        argocd.argoproj.io/sync-wave: "-5"  
+        argocd.argoproj.io/manifest-generate-paths: .
+    spec:
+      project: default
+      sources:
+        - repoURL: '{{metadata.annotations.addons_repo_url}}'
+          targetRevision: '{{metadata.annotations.addons_repo_revision}}'
+          ref: values
+        - path: bootstrap/beckn/{{values.addonChart}}
+          repoURL: '{{metadata.annotations.addons_repo_url}}'
+          targetRevision: '{{metadata.annotations.addons_repo_revision}}'
+          helm:
+            releaseName: '{{values.addonChart}}'
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
+            values: |
+              global:
+                namespace: {{values.addonChartRepositoryNamespace}}
+                redisCache:
+                  host: bap-common-redis-master.bap-common-services.svc.cluster.local
+                  port: 6379
+                responseCacheMongo:
+                  host: bap-common-mongodb.bap-common-services.svc.cluster.local
+                  port: 27017
+                  dbname: protocol_server
+                  username: "{{ metadata.annotations.bpp_mongo_auth_username }}"
+                  password: "{{ metadata.annotations.bpp_mongo_auth_password }}"
+                rabbitMQamqp:
+                  host: bap-common-rabbitmq.bap-common-services.svc.cluster.local
+                  port: 5672
+                  username: "{{ metadata.annotations.bap_rabbitmq_username }}"
+                  password: "{{ metadata.annotations.bap_rabbitmq_password }}"
+                registry_url:  "registry-beckn.{{ metadata.annotations.domain }}"
+                bap:
+                  privateKey: "{{ metadata.annotations.bap_private_key }}" 
+                  publicKey: "{{ metadata.annotations.bap_public_key }}"
+                externalDomain: "bap-network.{{ metadata.annotations.domain }}"              
+              bap-network:
+                ingress:
+                  enabled: true
+                  annotations:
+                    cert-manager.io/cluster-issuer: "{{ metadata.annotations.certificate_issuer }}"
+                  ingressClassName: nginx
+                  hosts:
+                    - host: bap-network.{{ metadata.annotations.domain }}
+                      paths:
+                        - /
+                  tls:
+                    - hosts:
+                        - bap-network.{{ metadata.annotations.domain }}
+                      secretName: bap-network-tls   
+              bap-client:
+                ingress:
+                  enabled: true
+                  annotations:
+                    cert-manager.io/cluster-issuer: "{{ metadata.annotations.certificate_issuer }}"
+                  ingressClassName: nginx
+                  hosts:
+                    - host: bap-client.{{ metadata.annotations.domain }}
+                      paths:
+                        - /
+                  tls:
+                    - hosts:
+                        - bap-client.{{ metadata.annotations.domain }}
+                      secretName: bap-client-tls   
+    
+      destination:
+        namespace: '{{values.addonChartRepositoryNamespace}}'
+        name: '{{name}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          # - ServerSideApply=true  # Big CRDs.

@@ -48,12 +48,12 @@ spec:
               mongodb: 
                 auth:
                   enabled: true
-                  rootUser: "{{ metadata.annotations.bpp_mongo_auth_username }}"
-                  rootPassword: "{{ metadata.annotations.bpp_mongo_auth_password }}"
+                  rootUser: "{{ metadata.annotations.bap_mongo_auth_username }}"
+                  rootPassword: "{{ metadata.annotations.bap_mongo_auth_password }}"
                   usernames:
-                    - "{{ metadata.annotations.bpp_mongo_username }}"
+                    - "{{ metadata.annotations.bap_mongo_username }}"
                   passwords:
-                    - "{{ metadata.annotations.bpp_mongo_password }}"
+                    - "{{ metadata.annotations.bap_mongo_password }}"
                   databases:
                     - "protocol_server" 
               rabbitmq: 

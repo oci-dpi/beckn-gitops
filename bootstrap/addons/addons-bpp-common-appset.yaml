@@ -58,8 +58,8 @@ spec:
                     - "protocol_server" 
               rabbitmq: 
                 auth:
-                  username: "{{ metadata.annotations.bap_rabbitmq_username }}" 
-                  password: "{{ metadata.annotations.bap_rabbitmq_password }}"
+                  username: "{{ metadata.annotations.bpp_rabbitmq_username }}" 
+                  password: "{{ metadata.annotations.bpp_rabbitmq_password }}"
                   securePassword: false 
       destination:
         namespace: '{{values.addonChartRepositoryNamespace}}'
