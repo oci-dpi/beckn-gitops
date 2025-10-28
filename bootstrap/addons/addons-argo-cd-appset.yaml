@@ -60,6 +60,7 @@ spec:
               configs:
                 secret:
                   argocdServerAdminPassword: {{metadata.annotations.argocd_admin_password}}
+                  argocdServerAdminPasswordMtime: "2006-01-02T15:04:05Z"
               server:
                 ingress:
                   enabled: {{metadata.annotations.create_ingress}}
