@@ -15,8 +15,8 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
-              HOST="{{ .Values.global.rabbitmq_host | default "bap-common-rabbitmq" }}"
-              PORT="{{ .Values.global.rabbitmq_port | default "5672" }}"
+              HOST="{{ .Values.global.rabbitMQamqp.host | default "bap-common-rabbitmq.bap-common" }}"
+              PORT="{{ .Values.global.rabbitMQamqp.port | default "5672" }}"
               echo "Checking readiness of RabbitMQ at $HOST:$PORT..."
               while true; do
                 if nc -z "$HOST" "$PORT"; then
