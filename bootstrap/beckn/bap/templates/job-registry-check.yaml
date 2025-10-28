@@ -17,7 +17,7 @@ spec:
           - |
             while true; do
               echo "Checking readiness of registry service...";
-              if curl -sfk https://{{ .Values.global.registry_url }}/; then
+              if curl -sfk {{ .Values.registry_url }}/; then
                 echo "Service is ready!";
                 exit 0;
               else
