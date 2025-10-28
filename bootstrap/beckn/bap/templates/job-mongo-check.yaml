@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
         - name: mongodb-readiness-check
-          image: mongo:7
+          image: docker.io/mongo:7
           command: ["sh", "-c"]
           args:
             - |

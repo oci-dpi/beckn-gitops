@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
         - name: rabbitmq-readiness-check
-          image: rabbitmq:3-management-alpine
+          image: docker.io/rabbitmq:3-management-alpine
           command: ["sh", "-c"]
           args:
             - |
