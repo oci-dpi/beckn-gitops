@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: beckn-strapi-deployment
+  labels:
+    app: beckn-strapi
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: beckn-strapi
+  template:
+    metadata:
+      labels:
+        app: beckn-strapi
+    spec:
+      containers:
+        - name: beckn-strapi
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          envFrom:
+            - configMapRef:
+                name: beckn-strapi-config
+            - secretRef:
+                name: beckn-strapi-secret

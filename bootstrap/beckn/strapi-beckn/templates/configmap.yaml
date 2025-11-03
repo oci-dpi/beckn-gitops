@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: beckn-strapi-config
+  labels:
+    app: beckn-strapi
+data:
+{{- range $key, $value := .Values.config }}
+  {{ $key }}: {{ $value | quote }}
+{{- end }}

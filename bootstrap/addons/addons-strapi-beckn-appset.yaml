@@ -1,0 +1,88 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: addons-strapi-beckn
+spec:
+  syncPolicy:
+    preserveResourcesOnDeletion: false
+  generators:
+    - merge:
+        mergeKeys: [server]
+        generators:
+          - clusters:
+              values:
+                addonChart: strapi-beckn
+                # anything not staging or prod use this version
+                addonChartVersion: 0.1.0
+                addonChartRepositoryNamespace: strapi
+              selector:
+                matchExpressions:
+                  - key: enable_beckn_disabled
+                    operator: In
+                    values: ['true']
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: dev
+              values:
+                addonChartVersion: 0.1.0
+  template:
+    metadata:
+      name: '{{values.addonChart}}'
+    spec:
+      project: default
+      sources:
+        - repoURL: '{{metadata.annotations.addons_repo_url}}'
+          targetRevision: '{{metadata.annotations.addons_repo_revision}}'
+          ref: values
+        - path: bootstrap/beckn/{{values.addonChart}}
+          repoURL: '{{metadata.annotations.addons_repo_url}}'
+          targetRevision: '{{metadata.annotations.addons_repo_revision}}'
+          helm:
+            releaseName: '{{values.addonChart}}'
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
+            values: |
+              secrets:
+                JWT_SECRET: "{{ metadata.annotations.strapi_jwt_secret }}"
+                ADMIN_JWT_SECRET: "{{ metadata.annotations.strapi_admin_jwt_secret }}"
+                API_TOKEN_SALT: "{{ metadata.annotations.strapi_api_token_salt }}"
+                TRANSFER_TOKEN_SALT: "{{ metadata.annotations.strapi_transfer_token_salt }}"
+              config:
+                DATABASE_CLIENT: "mysql2"
+                DATABASE_HOST: "strapi-mysql-strapi-mysql.strapi"
+                DATABASE_NAME: "strapi_deg_local"
+                DATABASE_USERNAME: "{{ metadata.annotations.strapi_user }}"
+                DATABASE_PASSWORD: "{{ metadata.annotations.strapi_password }}"
+                DATABASE_PORT: "3306"
+                DATABASE_SSL: "false"
+                NODE_ENV: "production"
+                HOST: "0.0.0.0"
+                PORT: "1337"
+                COMMERCE: "dsep:courses,dsep:jobs,dsep:scholarships,nic2004:52110,dhp:pharmacy:0.1.0,supply-chain-services:assembly,online-dispute-resolution:0.1.0,uei:charging,hospitality,tourism,mobility:1.1.0,dragon_foods,skyanalytics_flow,envirogrowth,harmoniaid,state_forest_department,earth_support_initiative,deg:retail,deg:rental,deg:ev,deg:schemes"
+                APPOINTMENT: "dhp:consultation:0.1.0,dhp:diagnostics:0.1.0,dhp:pharmacy:0.1.0,dsep:mentoring"
+                SYNC_RESPONSE: "false"
+                PROTOCOL_SERVER_URL: "http://bpp-client-svc.bpp:5002"
+                BPP_ID: "bpp-network-svc.bpp"
+                BPP_URI: "http://bpp-network-svc.bpp:5001"
+                BPP_ADAPTER_PLUGIN_URL: "http://127.0.0.1:1337/beckn-bpp-adapter"
+                STRAPI_BPP_URL: "http://127.0.0.1:1337"
+                BECKN_GEMINI_AI_URL: "http://127.0.0.1:3000"
+                MDM_URL: "https://mock-mdm.becknprotocol.io/beckn-mdm"
+                STRAPI_URL: "http://127.0.0.1:1337"
+                BECKN_ENV: "LOCAL"
+                WORLD_ENGINE_URL: "https://playground.becknprotocol.io/meter-data-simulator"
+                OPEN_AI_KEY: "Your Open AI API Key"
+                APP_KEYS: ""
+      destination:
+        namespace: '{{values.addonChartRepositoryNamespace}}'
+        name: '{{name}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          # - ServerSideApply=true  # Big CRDs.

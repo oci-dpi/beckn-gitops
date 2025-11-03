@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: beckn-strapi-service
+  labels:
+    app: beckn-strapi
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app: beckn-strapi
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.port }}
+      protocol: TCP
+      name: http-strapi

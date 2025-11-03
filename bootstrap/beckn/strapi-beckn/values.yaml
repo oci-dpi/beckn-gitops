@@ -1,0 +1,43 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/oci-demos/beckn-strapi
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 1337
+
+secrets:
+  JWT_SECRET: ""
+  ADMIN_JWT_SECRET: ""
+  API_TOKEN_SALT: ""
+  TRANSFER_TOKEN_SALT: ""
+
+config:
+  DATABASE_CLIENT: "mysql2"
+  DATABASE_HOST: "strapi-mysql-service"
+  DATABASE_NAME: "strapi_deg_local"
+  DATABASE_USERNAME: "root"
+  DATABASE_PASSWORD: ""
+  DATABASE_PORT: "3306"
+  DATABASE_SSL: "false"
+  NODE_ENV: "production"
+  HOST: "0.0.0.0"
+  PORT: "1337"
+  COMMERCE: "dsep:courses,dsep:jobs,dsep:scholarships,nic2004:52110,dhp:pharmacy:0.1.0,supply-chain-services:assembly,online-dispute-resolution:0.1.0,uei:charging,hospitality,tourism,mobility:1.1.0,dragon_foods,skyanalytics_flow,envirogrowth,harmoniaid,state_forest_department,earth_support_initiative,deg:retail,deg:rental,deg:ev,deg:schemes"
+  APPOINTMENT: "dhp:consultation:0.1.0,dhp:diagnostics:0.1.0,dhp:pharmacy:0.1.0,dsep:mentoring"
+  SYNC_RESPONSE: "false"
+  PROTOCOL_SERVER_URL: "http://bpp-client-svc.beckn-onix-bpp:6002"
+  BPP_ID: "bpp-network-svc.beckn-onix-bpp"
+  BPP_URI: "http://bpp-network-svc.beckn-onix-bpp:6001"
+  BPP_ADAPTER_PLUGIN_URL: "http://127.0.0.1:1337/beckn-bpp-adapter"
+  STRAPI_BPP_URL: "http://127.0.0.1:1337"
+  BECKN_GEMINI_AI_URL: "http://127.0.0.1:3000"
+  MDM_URL: "https://mock-mdm.becknprotocol.io/beckn-mdm"
+  STRAPI_URL: "http://127.0.0.1:1337"
+  BECKN_ENV: "LOCAL"
+  WORLD_ENGINE_URL: "https://playground.becknprotocol.io/meter-data-simulator"
+  OPEN_AI_KEY: "Your Open AI API Key"
+  APP_KEYS: ""
