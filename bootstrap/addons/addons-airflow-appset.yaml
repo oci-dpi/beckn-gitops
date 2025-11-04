@@ -58,6 +58,9 @@ spec:
               postgresql: 
                 global: 
                   storageClass: oci-bv
+                image:
+                  registry: docker.io
+                  repository: bitnamilegacy/postgresql
               workers: 
                 persistence: 
                   storageClassName: oci-bv
