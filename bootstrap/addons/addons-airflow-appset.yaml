@@ -90,4 +90,4 @@ spec:
           selfHeal: true
         syncOptions:
           - CreateNamespace=true
-          - ServerSideApply=true  # Big CRDs.
+          # - ServerSideApply=true  # Big CRDs.
