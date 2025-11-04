@@ -61,6 +61,8 @@ spec:
                 image:
                   registry: docker.io
                   repository: bitnamilegacy/postgresql
+              webserver:
+                enabled: true
               workers: 
                 persistence: 
                   storageClassName: oci-bv
