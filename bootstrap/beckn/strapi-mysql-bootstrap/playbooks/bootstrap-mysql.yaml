@@ -1,0 +1,76 @@
+---
+- name: Bootstrap MySQL inside Strapi pod
+  hosts: bastion
+  tasks:
+    - name: Get MySQL pod name
+      shell: |
+        kubectl get pods -n {{ namespace }} -l app={{ app_label }} -o jsonpath='{.items[0].metadata.name}'
+      register: mysql_pod_name
+      changed_when: false
+
+    - name: Show MySQL pod name
+      debug:
+        msg: "🎯 MySQL pod detected: {{ mysql_pod_name.stdout }}"
+
+    - name: Create MySQL user and grant privileges
+      shell: |
+        kubectl exec -n {{ namespace }} {{ mysql_pod_name.stdout }} -- bash -c "
+          mysql -u{{ mysql_user }} -p{{ mysql_password }} -e \"
+            CREATE USER IF NOT EXISTS '{{ mysql_user }}'@'%' IDENTIFIED BY '{{ mysql_password }}';
+            GRANT ALL PRIVILEGES ON *.* TO '{{ mysql_user }}'@'%' WITH GRANT OPTION;
+            FLUSH PRIVILEGES;
+          \"
+        "
+      register: create_user_output
+      args:
+        warn: false
+
+    - name: Show output - Create user and grant
+      debug:
+        var: create_user_output.stdout_lines
+
+    - name: Create database if not exists
+      shell: |
+        kubectl exec -n {{ namespace }} {{ mysql_pod_name.stdout }} -- bash -c "
+          mysql -u{{ mysql_user }} -p{{ mysql_password }} -e \"
+            CREATE DATABASE IF NOT EXISTS {{ db_name }};
+          \"
+        "
+      register: create_db_output
+      args:
+        warn: false
+
+    - name: Show output - Create DB
+      debug:
+        var: create_db_output.stdout_lines
+
+    - name: Check if database is empty
+      shell: |
+        kubectl exec -n {{ namespace }} {{ mysql_pod_name.stdout }} -- bash -c "
+          mysql -u{{ mysql_user }} -p{{ mysql_password }} -Nse 'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=\"{{ db_name }}\";'
+        "
+      register: table_count
+      changed_when: false
+
+    - name: Show table count in database
+      debug:
+        msg: "📊 Table count in {{ db_name }}: {{ table_count.stdout }}"
+
+    - name: Import dump only if DB is empty
+      shell: |
+        kubectl exec -n {{ namespace }} {{ mysql_pod_name.stdout }} -- bash -c "
+          mysql -u{{ mysql_user }} -p{{ mysql_password }} {{ db_name }} < {{ dump_file_path }}
+        "
+      when: table_count.stdout|int == 0
+      register: import_output
+      args:
+        warn: false
+
+    - name: Show output - Import dump
+      debug:
+        var: import_output.stdout_lines
+
+    - name: Skip import if DB already initialized
+      debug:
+        msg: "✅ Database already initialized, skipping import."
+      when: table_count.stdout|int > 0

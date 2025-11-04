@@ -1,0 +1,12 @@
+bastion:
+  hosts:
+    bastion:
+      ansible_host: localhost
+      ansible_connection: local
+  vars:
+    mysql_namespace: "strapi"
+    mysql_label_selector: "app=strapi-mysql"
+    mysql_user: "{{ .Values.mysql.rootUser }}"
+    mysql_password: "{{ .Values.mysql.rootPassword}}"
+    db_name: "strapi_deg_local"
+    dump_file_path: "/tmp/working-directory/strapi_dump.sql

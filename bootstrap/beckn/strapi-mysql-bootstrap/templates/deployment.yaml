@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "strapi-mysql.fullname" . }}
+  labels:
+    app: {{ include "strapi-mysql.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "strapi-mysql.name" . }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ include "strapi-mysql.name" . }}
+    spec:
+      containers:
+        - name: {{ include "strapi-mysql.name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.mysql.port }}
+          env:
+            - name: MYSQL_ROOT_USER
+              value: {{ .Values.mysql.rootUser | quote }}
+            - name: MYSQL_ROOT_PASSWORD
+              value: {{ .Values.mysql.rootPassword | quote }}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
+            - name: config
+              mountPath: /etc/my.cnf
+              subPath: custom.cnf
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "strapi-mysql.fullname" . }}-data
+        - name: config
+          configMap:
+            name: {{ include "strapi-mysql.fullname" . }}-config
+            items:
+              - key: custom.cnf
+                path: custom.cnf
