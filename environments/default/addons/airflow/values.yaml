@@ -65,7 +65,7 @@ containerLifecycleHooks: {}
 airflowHome: /opt/airflow
 
 # Default airflow repository -- overridden by all the specific images below
-defaultAirflowRepository: apache/airflow
+defaultAirflowRepository: docker.io/apache/airflow
 
 # Default airflow tag to deploy
 defaultAirflowTag: "3.0.2"
