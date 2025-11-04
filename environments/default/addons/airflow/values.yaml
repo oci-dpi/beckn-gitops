@@ -108,7 +108,7 @@ images:
     tag: v0.28.0
     pullPolicy: IfNotPresent
   redis:
-    repository: redis
+    repository: docker.io/redis
     # Redis is limited to 7.2-bookworm due to licencing change
     # https://redis.io/blog/redis-adopts-dual-source-available-licensing/
     tag: 7.2-bookworm
