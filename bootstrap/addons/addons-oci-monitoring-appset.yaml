@@ -1,3 +1,20 @@
+# -----------------------------------------------------------------------------
+# This ApplicationSet requires the following ArgoCD Application annotations:
+# - addons_repo_url:               The Git repository URL containing addon sources
+# - addons_repo_revision:          The Git revision/branch containing addon sources
+# - addons_repo_basepath:          The base path prefix within the repository
+# - oke_cluster_id:                The OKE Kubernetes Cluster OCID
+# - oke_cluster_compartment_id:    The compartment OCID where the cluster resides
+# - cluster_name:                  The Kubernetes Cluster Name
+# - log_analysis_namespace:        The namespace for log analysis resources
+# - log_group_id:                  The Log Analytics Log Group OCID
+# - log_analytics_entity_id:       The Log Analytics Cluster Entity OCID
+# - mgmt_agent_rsp_cnt:            The Management Agent Install Key file contents
+#
+# These annotations are used for templating Helm chart values, and must be set 
+# on the Application resource that references this ApplicationSet.
+# -----------------------------------------------------------------------------
+
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
