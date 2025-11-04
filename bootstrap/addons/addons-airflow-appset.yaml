@@ -19,7 +19,7 @@ spec:
                 addonChartRepository: https://airflow.apache.org
               selector:
                 matchExpressions:
-                  - key: enable_airflow
+                  - key: enable_beckn
                     operator: In
                     values: ['true']
           - clusters:
@@ -54,8 +54,22 @@ spec:
             valueFiles:
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/{{metadata.labels.environment}}/addons/{{values.addonChart}}/values.yaml
-            # values: |
-            #   installCRDs: true
+            values: |
+              workers: 
+                persistence: 
+                  storageClassName: oci-bv
+              triggerer: 
+                persistence: 
+                  storageClassName: oci-bv 
+              redis: 
+                persistence: 
+                  storageClassName: oci-bv
+              dags: 
+                persistence: 
+                  storageClassName: oci-bv          
+              logs: 
+                persistence: 
+                  storageClassName: oci-bv
       destination:
         namespace: '{{values.addonChartRepositoryNamespace}}'
         name: '{{name}}'
