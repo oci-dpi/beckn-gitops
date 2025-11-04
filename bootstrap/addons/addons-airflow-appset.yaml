@@ -70,6 +70,9 @@ spec:
               redis: 
                 persistence: 
                   storageClassName: oci-bv
+                password: "{{metadata.annotations.pg_db_password}}"
+              data:                                                                                                 
+                brokerUrl: "redis://:{{metadata.annotations.pg_db_password}}@airflow-redis:6379/0"
               dags: 
                 persistence: 
                   storageClassName: oci-bv          
