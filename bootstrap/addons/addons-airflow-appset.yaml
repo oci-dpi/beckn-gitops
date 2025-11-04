@@ -57,7 +57,7 @@ spec:
             values: |
               postgres: 
                 global: 
-                  defaultStorageClass: oci-bv
+                  storageClass: oci-bv
               workers: 
                 persistence: 
                   storageClassName: oci-bv
