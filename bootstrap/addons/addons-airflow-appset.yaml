@@ -19,7 +19,7 @@ spec:
                 addonChartRepository: https://airflow.apache.org
               selector:
                 matchExpressions:
-                  - key: enable_beckn
+                  - key: enable_beckn_disabled
                     operator: In
                     values: ['true']
           - clusters:
