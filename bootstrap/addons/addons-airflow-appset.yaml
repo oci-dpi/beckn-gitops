@@ -55,6 +55,9 @@ spec:
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/{{metadata.labels.environment}}/addons/{{values.addonChart}}/values.yaml
             values: |
+              postgres: 
+                global: 
+                  defaultStorageClass: oci-bv
               workers: 
                 persistence: 
                   storageClassName: oci-bv
