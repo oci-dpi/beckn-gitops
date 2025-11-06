@@ -59,7 +59,8 @@ spec:
                 '{{ .Release.Name }}-git-creds':
                   type: 'Opaque'
                   stringData: |
-                    AIRFLOW_CONN_OTHER: 'other_conn'
+                    GITSYNC_USERNAME: "{{ metadata.annotations.github_username }}"
+                    GITSYNC_PASSWORD: "{{ metadata.annotations.github_token }}"
               ingress:
                 apiServer:
                   enabled: true
