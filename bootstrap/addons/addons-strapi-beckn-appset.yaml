@@ -53,7 +53,7 @@ spec:
               config:
                 DATABASE_CLIENT: "mysql2"
                 DATABASE_HOST: "strapi-mysql-strapi-mysql.strapi"
-                DATABASE_NAME: "strapi"
+                DATABASE_NAME: "strapi_deg_local"
                 DATABASE_USERNAME: "{{ metadata.annotations.strapi_user }}"
                 DATABASE_PASSWORD: "{{ metadata.annotations.strapi_password }}"
                 DATABASE_PORT: "3306"
