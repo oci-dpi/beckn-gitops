@@ -83,7 +83,7 @@
 
     - name: Import dump only if DB is empty
       shell: |
-        kubectl exec -n {{ namespace }} {{ mysql_pod_name.stdout }} -- bash -c "
+        kubectl exec -i -n {{ namespace }} {{ mysql_pod_name.stdout }} -- bash -c "
           mysql -u{{ mysql_user }} -p{{ mysql_password }} {{ db_name }} < {{ dump_file_path }}
         "
       when: table_count.stdout | int == 0
