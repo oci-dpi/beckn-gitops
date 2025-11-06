@@ -55,6 +55,16 @@ spec:
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/{{metadata.labels.environment}}/addons/{{values.addonChart}}/values.yaml
             values: |
+              ingress:
+                apiServer:
+                  enabled: true
+                  annotations:
+                    cert-manager.io/cluster-issuer: "{{ metadata.annotations.certificate_issuer }}"
+                  hosts:
+                    - name: "airflow.{{ metadata.annotations.domain }}"
+                      tls:
+                        enabled: true
+                        secretName: "airflow-api-tls"
               postgresql: 
                 global: 
                   storageClass: oci-bv
