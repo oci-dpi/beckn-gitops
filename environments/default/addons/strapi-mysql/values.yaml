@@ -8,7 +8,7 @@ image:
 
 persistence:
   enabled: true
-  storageClass: longhorn
+  storageClass: oci-bv
   accessMode: ReadWriteOnce
   size: 1Gi
 
