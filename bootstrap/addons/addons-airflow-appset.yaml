@@ -74,6 +74,14 @@ spec:
                   repository: bitnamilegacy/postgresql
               webserver:
                 enabled: true
+                defaultUser:
+                  enabled: true
+                  role: Admin
+                  username: "{{ metadata.annotations.airflow_admin_username }}"
+                  email: admin@example.com
+                  firstName: admin
+                  lastName: user
+                  password: "{{ metadata.annotations.airflow_admin_password }}"
               workers: 
                 persistence: 
                   storageClassName: oci-bv
