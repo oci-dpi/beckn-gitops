@@ -6,6 +6,7 @@ bastion:
   vars:
     mysql_namespace: "strapi"
     mysql_label_selector: "app=strapi-mysql"
+    app_label: "strapi-mysql"
     mysql_user: "{{ .Values.mysql.rootUser }}"
     mysql_password: "{{ .Values.mysql.rootPassword}}"
     db_name: "strapi_deg_local"
