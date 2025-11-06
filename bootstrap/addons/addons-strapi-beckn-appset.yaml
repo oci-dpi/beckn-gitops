@@ -75,7 +75,7 @@ spec:
                 BECKN_ENV: "LOCAL"
                 WORLD_ENGINE_URL: "https://playground.becknprotocol.io/meter-data-simulator"
                 OPEN_AI_KEY: "Your Open AI API Key"
-                APP_KEYS: ""{{ metadata.annotations.strapi_app_keys }}""
+                APP_KEYS: "{{ metadata.annotations.strapi_app_keys }}"
       destination:
         namespace: '{{values.addonChartRepositoryNamespace}}'
         name: '{{name}}'
