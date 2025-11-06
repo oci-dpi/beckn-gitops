@@ -9,4 +9,5 @@ bastion:
     mysql_user: "{{ .Values.mysql.rootUser }}"
     mysql_password: "{{ .Values.mysql.rootPassword}}"
     db_name: "strapi_deg_local"
-    dump_file_path: "/tmp/working-directory/strapi_dump.sql
+    dump_file_path: "/tmp/working-directory/strapi_dump.sql"
+    dump_url: "https://raw.githubusercontent.com/beckn/strapi-bap-bpp/refs/heads/feat/deg/strapi-setup/setup/strapi_dump.sql"

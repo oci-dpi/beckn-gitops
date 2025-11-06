@@ -2,31 +2,6 @@
 - name: Bootstrap MySQL inside Strapi pod
   hosts: bastion
   tasks:
-    - name: Ensure working directory exists
-      file:
-        path: "{{ dump_file_path | dirname }}"
-        state: directory
-        mode: '0755'
-
-    - name: Download Strapi SQL dump
-      get_url:
-        url: "{{ dump_url }}"
-        dest: "{{ dump_file_path }}"
-        mode: '0644'
-      register: dump_download
-      retries: 3
-      delay: 5
-      until: dump_download is succeeded
-
-    - name: Verify dump file size
-      stat:
-        path: "{{ dump_file_path }}"
-      register: dump_stat
-
-    - name: Show dump file size
-      debug:
-        msg: "💾 SQL dump downloaded: {{ dump_stat.stat.size | human_readable }}"
-
     - name: Get MySQL pod name
       shell: |
         kubectl get pods -n {{ namespace }} -l app={{ app_label }} -o jsonpath='{.items[0].metadata.name}'
@@ -86,7 +61,7 @@
         kubectl exec -n {{ namespace }} {{ mysql_pod_name.stdout }} -- bash -c "
           mysql -u{{ mysql_user }} -p{{ mysql_password }} {{ db_name }} < {{ dump_file_path }}
         "
-      when: table_count.stdout | int == 0
+      when: table_count.stdout|int == 0
       register: import_output
       args:
         warn: false
@@ -94,9 +69,8 @@
     - name: Show output - Import dump
       debug:
         var: import_output.stdout_lines
-      when: table_count.stdout | int == 0
 
     - name: Skip import if DB already initialized
       debug:
         msg: "✅ Database already initialized, skipping import."
-      when: table_count.stdout | int > 0
+      when: table_count.stdout|int > 0
