@@ -2987,7 +2987,7 @@ dags:
     #     GITSYNC_PASSWORD: <base64_encoded_git_password>
     # and specify the name of the secret below
     #
-    credentialsSecret: {{ .Release.Name }}-git-creds
+    credentialsSecret: git-creds
     #
     #
     # If you are using an ssh clone url, you can load
