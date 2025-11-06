@@ -59,8 +59,8 @@ spec:
                 'git-creds':
                   type: 'Opaque'
                   stringData: |
-                    GITSYNC_USERNAME: "{{ metadata.annotations.github_username }}"
-                    GITSYNC_PASSWORD: "{{ metadata.annotations.github_token }}"
+                    GIT_SYNC_USERNAME: "{{ metadata.annotations.github_username }}"
+                    GIT_SYNC_PASSWORD: "{{ metadata.annotations.github_token }}"
               ingress:
                 apiServer:
                   enabled: true
