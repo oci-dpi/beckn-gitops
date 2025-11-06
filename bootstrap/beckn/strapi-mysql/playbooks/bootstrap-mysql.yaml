@@ -81,15 +81,37 @@
       debug:
         msg: "📊 Table count in {{ db_name }}: {{ table_count.stdout }}"
 
+    - name: Copy SQL dump into pod
+      shell: |
+        kubectl cp {{ dump_file_path }} -n {{ namespace }} {{ mysql_pod_name.stdout }}:/tmp/strapi_dump.sql
+      args:
+        warn: false
+      register: copy_result
+
+    - name: Show copy result
+      debug:
+        var: copy_result.stdout_lines
+
+    # - name: Import dump only if DB is empty
+    #   shell: |
+    #     kubectl exec -i -n {{ namespace }} {{ mysql_pod_name.stdout }} -- bash -c "
+    #       mysql -u{{ mysql_user }} -p{{ mysql_password }} {{ db_name }} < {{ dump_file_path }}
+    #     "
+    #   when: table_count.stdout | int == 0
+    #   register: import_output
+    #   args:
+    #     warn: false
+
     - name: Import dump only if DB is empty
       shell: |
-        kubectl exec -i -n {{ namespace }} {{ mysql_pod_name.stdout }} -- bash -c "
-          mysql -u{{ mysql_user }} -p{{ mysql_password }} {{ db_name }} < {{ dump_file_path }}
+        kubectl exec -n {{ namespace }} {{ mysql_pod_name.stdout }} -- bash -c "
+          mysql -u{{ mysql_user }} -p{{ mysql_password }} {{ db_name }} < /tmp/strapi_dump.sql
         "
-      when: table_count.stdout | int == 0
+      when: table_count.stdout|int == 0
       register: import_output
       args:
         warn: false
+
 
     - name: Show output - Import dump
       debug:
