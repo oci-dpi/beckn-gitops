@@ -60,6 +60,7 @@ spec:
                   enabled: true
                   annotations:
                     cert-manager.io/cluster-issuer: "{{ metadata.annotations.certificate_issuer }}"
+                  ingressClassName: nginx
                   hosts:
                     - name: "airflow.{{ metadata.annotations.domain }}"
                       tls:
