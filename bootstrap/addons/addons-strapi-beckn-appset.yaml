@@ -18,7 +18,7 @@ spec:
                 addonChartRepositoryNamespace: strapi
               selector:
                 matchExpressions:
-                  - key: enable_beckn
+                  - key: enable_beckn_disable
                     operator: In
                     values: ['true']
           - clusters:
