@@ -19,7 +19,7 @@ spec:
                 addonChartRepository: https://airflow.apache.org
               selector:
                 matchExpressions:
-                  - key: enable_beckn-disable
+                  - key: enable_beckn
                     operator: In
                     values: ['true']
           - clusters:
@@ -59,7 +59,7 @@ spec:
                 apiServer:
                   enabled: true
                   annotations:
-                    cert-manager.io/cluster-issuer: "{{ metadata.annotations.certificate_issuer }}"
+                    cert-manager.io/cluster-issuer: "{{ metadata.annotations.certificate_issuer_stage }}"
                   ingressClassName: nginx
                   hosts:
                     - name: "airflow.{{ metadata.annotations.domain }}"
