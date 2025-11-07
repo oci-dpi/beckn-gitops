@@ -18,7 +18,7 @@ spec:
                 addonChartRepositoryNamespace: bpp
               selector:
                 matchExpressions:
-                  - key: enable_beckn
+                  - key: enable_beckn_disable
                     operator: In
                     values: ['true']
           - clusters:
@@ -69,8 +69,8 @@ spec:
                   privateKey: "{{ metadata.annotations.bpp_private_key }}" 
                   publicKey: "{{ metadata.annotations.bpp_public_key }}"
                 externalDomain: "bpp-network.{{ metadata.annotations.domain }}" 
-                webhookDomain: "bpp-webhook.{{ metadata.annotations.domain }}"          
               bpp-network:
+                webhookDomain: "bpp-webhook.{{ metadata.annotations.domain }}"          
                 ingress:
                   enabled: true
                   annotations:
@@ -85,6 +85,7 @@ spec:
                         - bpp-network.{{ metadata.annotations.domain }}
                       secretName: bpp-network-tls   
               bpp-client:
+                webhookDomain: "bpp-webhook.{{ metadata.annotations.domain }}"          
                 ingress:
                   enabled: true
                   annotations:
