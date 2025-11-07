@@ -41,3 +41,17 @@ config:
   WORLD_ENGINE_URL: "https://playground.becknprotocol.io/meter-data-simulator"
   OPEN_AI_KEY: "Your Open AI API Key"
   APP_KEYS: ""
+
+
+ingress:
+  enabled: false
+  annotations: {}
+  ingressClassName: nginx
+  hosts:
+    - host: bpp-webhook.example.com
+      paths:
+        - /
+  tls:
+    - hosts:
+        - bpp-webhook.example.com
+      secretName: wehbook-tls

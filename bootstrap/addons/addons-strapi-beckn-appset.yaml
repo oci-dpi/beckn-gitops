@@ -45,6 +45,19 @@ spec:
             valueFiles:
               - $values/{{metadata.annotations.addons_repo_basepath}}environments/default/addons/{{values.addonChart}}/values.yaml
             values: |
+              ingress:
+                enabled: true
+                annotations:
+                  cert-manager.io/cluster-issuer: "{{ metadata.annotations.certificate_issuer }}"
+                ingressClassName: nginx
+                hosts:
+                  - host: "bpp-webhook.{{ metadata.annotations.domain }}"
+                    paths:
+                      - /
+                tls:
+                  - hosts:
+                      - "bpp-webhook.{{ metadata.annotations.domain }}"
+                    secretName: bpp-webhook-tls
               secrets:
                 JWT_SECRET: "{{ metadata.annotations.strapi_jwt_secret }}"
                 ADMIN_JWT_SECRET: "{{ metadata.annotations.strapi_admin_jwt_secret }}"
