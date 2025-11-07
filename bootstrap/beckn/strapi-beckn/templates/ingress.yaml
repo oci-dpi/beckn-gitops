@@ -24,7 +24,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ include "common.name" $ }}-svc
+                name: beckn-strapi-service
                 port:
                   number: {{ $.Values.service.port }}
           {{- end }}
