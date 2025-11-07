@@ -68,7 +68,8 @@ spec:
                 bpp:
                   privateKey: "{{ metadata.annotations.bpp_private_key }}" 
                   publicKey: "{{ metadata.annotations.bpp_public_key }}"
-                externalDomain: "bpp-network.{{ metadata.annotations.domain }}"              
+                externalDomain: "bpp-network.{{ metadata.annotations.domain }}" 
+                webhookDomain: "bpp-webhook.{{ metadata.annotations.domain }}"          
               bpp-network:
                 ingress:
                   enabled: true
