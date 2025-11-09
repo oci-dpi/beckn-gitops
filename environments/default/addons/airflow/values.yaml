@@ -80,7 +80,7 @@ airflowVersion: "3.0.2"
 images:
   airflow:
     repository: ghcr.io/oci-sunbird/airflow
-    tag: 3.0.2-custom
+    tag: 3.0.2-custom-amd64
     # Specifying digest takes precedence over tag.
     digest: ~
     pullPolicy: IfNotPresent
