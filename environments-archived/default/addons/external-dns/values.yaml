@@ -1,9 +1,0 @@
-# Helm chart values
-sources:
-  - service
-  - ingress
-provider: oci
-txtOwnerId: beckn-external-dns
-registry: txt
-interval: 2m
-policy: upsert-only

@@ -1,7 +1,0 @@
-# Helm chart values
-image: 
-  repository: bitnamilegacy/mongodb
-global:
-  storageClass: "longhorn"
-persistence:
-  size: 1Gi
